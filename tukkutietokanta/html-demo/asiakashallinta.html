@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tuksun Tukkuliike</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="../css/bootstrap.css" rel="stylesheet">
+        <link href="../css/bootstrap-min.css" rel="stylesheet">
+        <link href="../css/bootstrap-theme.css" rel="stylesheet">
+        <link href="../css/main.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <br>
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <ul class="nav">
+                            <li><a href="tilaus-new.html">Luo uusi tilaus</a></li>
+                            <li><a href="index.html">Tuotevalikoima</a></li>
+                            <li><a href="tilausseuranta.html">Tilausten seuranta</a></li>
+                            <li class="active"><a>Asiakkaiden hallinta</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <object data=header.html style="width:100%"></object>
+                </div>
+                <div class="col-md-2">
+                    <a class="btn btn-default" href="kirjautuminen.html">Kirjaudu ulos</a>
+                </div>
+            </div>
+            
+            <div class="row">
+                <h2>Asiakkaiden hallinta</h2>
+                <br>
+                <form class="form-horizontal" method="POST">
+                    <div class="form-group">
+                        <label for="asiakasnumero" class="col-md-2 control-label">Etsi asiakasnumerolla</label>
+                        <div class="col-md-4">
+                            <input type="number" class="form-control" id="asiakasnumero" name="asiakasnumero">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-4">
+                            <a class="btn btn-default" href="asiakas-view.html">Hae asiakas</a>
+                        </div>
+                    </div>
+                </form>  
+            </div>
+            
+            <div class="row">
+                <br>
+                <p><a class="btn btn-default" href="asiakas-list.html">Listaa kaikki asiakkaat</a></p>
+                <p><a class="btn btn-default" href="asiakas-list.html">Listaa luottolimiitin ylittäneet asiakkaat</a></p>
+                <p><a class="btn btn-default" href="asiakas-new.html">Perusta uusi asiakas</a></p>
+            </div>
+
+            <div class="row">
+                <hr>
+                <object data=viimeisimmat.html style="width:100%" height='300'></object>
+            </div>
+        </div>
+    </body>
+</html>

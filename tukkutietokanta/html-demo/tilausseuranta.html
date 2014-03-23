@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tuksun Tukkuliike</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="../css/bootstrap.css" rel="stylesheet">
+        <link href="../css/bootstrap-min.css" rel="stylesheet">
+        <link href="../css/bootstrap-theme.css" rel="stylesheet">
+        <link href="../css/main.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <br>
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <ul class="nav">
+                            <li><a href="tilaus-new.html">Luo uusi tilaus</a></li>
+                            <li><a href="index.html">Tuotevalikoima</a></li>
+                            <li class="active"><a>Tilausten seuranta</a></li>
+                            <li><a href="asiakashallinta.html">Asiakkaiden hallinta</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <object data=header.html style="width:100%"></object>
+                </div>
+                <div class="col-md-2">
+                    <a class="btn btn-default" href="kirjautuminen.html">Kirjaudu ulos</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <h2>Tilausten seuranta</h2>
+                <br>
+                <form class="form-horizontal" method="POST">
+                    <div class="form-group">
+                        <label for="asiakasnro" class="col-md-2 control-label">Asiakasnumero</label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="asiakasnro" name="asiakasnro">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="tuotenro" class="col-md-2 control-label">Tuotenumero</label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="tuotenro" name="tuotenro">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="viite" class="col-md-2 control-label">Ostoviite</label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="viite" name="viite">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pvmBegin" class="col-md-2 control-label">Päivämäärä alkaen</label>
+                        <div class="col-md-4">
+                            <input type="date" class="form-control" id="pvmBegin" name="pvmBegin">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pvmEnd" class="col-md-2 control-label">Päivämäärä päättyen</label>
+                        <div class="col-md-4">
+                            <input type="date" class="form-control" id="pvmEnd" name="pvmEnd">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-4">
+                            <a class="btn btn-default" href="tilaus-list.html">Hae tilauksia</a>
+                        </div>
+                    </div>
+                </form>     
+            </div>
+            
+            <div class="row">
+                <br>
+                <form class="form-horizontal" method="POST">
+                    <div class="form-group">
+                        <label for="tilausnro" class="col-md-2 control-label">Etsi tilausnumerolla</label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="tilausnro" name="tilausnro">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-4">
+                            <a class="btn btn-default" href="tilaus-view.html">Hae tilaus</a>
+                        </div>
+                    </div>
+                </form>  
+            </div>
+            
+            <div class="row">
+                <br>
+                <p><a class="btn btn-default" href="tilaus-list.html">Listaa kaikki avoimet tilaukset</a></p>
+                <p><a class="btn btn-default" href="tilaus-list.html">Listaa tilaukset joilta lasku maksamatta</a></p>
+            </div>
+
+            <div class="row">
+                <hr>
+                <object data=viimeisimmat.html style="width:100%" height='300'></object>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tuksun Tukkuliike</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="../css/bootstrap.css" rel="stylesheet">
+        <link href="../css/bootstrap-min.css" rel="stylesheet">
+        <link href="../css/bootstrap-theme.css" rel="stylesheet">
+        <link href="../css/main.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <br>
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <ul class="nav">
+                            <li><a href="tilaus-new.html">Luo uusi tilaus</a></li>
+                            <li><a href="index.html">Tuotevalikoima</a></li>
+                            <li class="active"><a href="tilausseuranta.html">Tilausten seuranta</a></li>
+                            <li><a href="asiakashallinta.html">Asiakkaiden hallinta</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <object data=header.html style="width:100%"></object>
+                </div>
+                <div class="col-md-2">
+                    <a class="btn btn-default" href="kirjautuminen.html">Kirjaudu ulos</a>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <h2>Tilaus 10040</h2>
+                <br>
+            </div>
+
+            <div class="row">
+                <h3>Tilaajan tiedot</h3>
+                <br>
+                <form class="form-horizontal" method="POST">
+                    <div class="form-group">
+                        <label for="asiakasnro" class="col-md-2 control-label">Asiakasnumero</label>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="asiakasnro" name="asiakasnro">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="nimi" class="col-md-2 control-label">Nimi</label>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="nimi" name="nimi">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="osoite" class="col-md-2 control-label">Osoite</label>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="osoite" name="osoite">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="col-md-2 control-label">Sähköposti</label>
+                        <div class="col-md-6">
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="henkilo" class="col-md-2 control-label">Yhteyshenkilö</label>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="henkilo" name="henkilo">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="puhelin" class="col-md-2 control-label">Puhelinnumero</label>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="puhelin" name="puhelin">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="luotto" class="col-md-2 control-label">Luottoraja</label>
+                        <div class="col-md-6">
+                            <input type="number" class="form-control" id="luotto" name="luotto">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <h3>Tuotteet</h3>
+                <br>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th>Tuotenumero</th>
+                            <th>Koodi</th>
+                            <th>Valmistaja</th>
+                            <th>Kappalehinta</th>
+                            <th>Kappalemäärä</th>
+                            <th>Varastossa</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>100001</td>
+                            <td>053ADEGF</td>
+                            <td>Valmistaja1</td>
+                            <td>6,00 EUR</td>
+                            <td>1</td>
+                            <td>50</td>
+                            <td><a class="btn btn-xs btn-default"><span class="glyphicon glyphicon-remove"></span> Peru rivi</a></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>100045</td>
+                            <td>awesomeproductX</td>
+                            <td>Valmistaja1</td>
+                            <td>14,99 EUR</td>
+                            <td>2</td>
+                            <td>14</td>
+                            <td><a class="btn btn-xs btn-default"><span class="glyphicon glyphicon-remove"></span> Peru rivi</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-5">
+                        <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Peru tilaus</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
