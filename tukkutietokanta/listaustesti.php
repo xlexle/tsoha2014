@@ -1,7 +1,8 @@
 <?php
-require_once "libs/tietokantayhteys.php";
-require_once "libs/models/yllapitaja.php";
-$lista = Yllapitaja::etsiYllapitajat();
+require "libs/models/asiakas.php";
+require "libs/models/yllapitaja.php";
+$asiakaslista = Asiakas::haeKaikkiAsiakkaat();
+$yllapitajalista = Yllapitaja::haeKaikkiYllapitajat();
 ?><!DOCTYPE html>
 <html>
     <head>
@@ -10,9 +11,18 @@ $lista = Yllapitaja::etsiYllapitajat();
     </head>
     <body>
         <h1>Listaustesti</h1>
+        <h2>Asiakkaiden kirjautumistiedot</h2>
         <ul>
-            <?php foreach ($lista as $asia) { ?>
-                <li><?php echo $asia->getTunnus(); ?></li>
+            <?php foreach ($asiakaslista as $asia) { ?>
+                <li>Tunnus: <?php echo $asia->getTunnus(); ?>,
+                    Salasana: <?php echo $asia->getSalasana(); ?></li>
+            <?php } ?>
+        </ul>
+        <h2>Ylläpitäjien kirjautumistiedot</h2>
+        <ul>
+            <?php foreach ($yllapitajalista as $asia) { ?>
+                <li>Tunnus: <?php echo $asia->getTunnus(); ?>,
+                    Salasana: <?php echo $asia->getSalasana(); ?></li>
             <?php } ?>
         </ul>
     </body>

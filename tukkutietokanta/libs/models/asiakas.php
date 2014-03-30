@@ -2,7 +2,7 @@
 
 require_once "libs/common.php";
 
-class Yllapitaja {
+class Asiakas {
 
     private $tunnus;
     private $salasana;
@@ -28,8 +28,12 @@ class Yllapitaja {
         $this->salasana = $salasana;
     }
 
-    public static function etsiYllapitajaTunnuksilla($tunnus, $salasana) {
-        $sql = "SELECT tunnus, salasana FROM yllapitaja WHERE tunnus = ? AND salasana = ? LIMIT 1";
+    public static function etsiAsiakasTunnuksilla($tunnus, $salasana) {
+        if (!is_numeric($tunnus) || !(floor($tunnus) == $tunnus)) {
+            return null;
+        }
+
+        $sql = "SELECT tunnus, salasana FROM asiakas WHERE tunnus = ? AND salasana = ? LIMIT 1";
         $kysely = getTietokantayhteys()->prepare($sql);
         $kysely->execute(array($tunnus, $salasana));
 
@@ -37,25 +41,26 @@ class Yllapitaja {
         if ($tulos == null) {
             return null;
         } else {
-            $kayttaja = new Yllapitaja();
+            $kayttaja = new Asiakas();
             $kayttaja->setTunnus($tulos->tunnus);
             $kayttaja->setSalasana($tulos->salasana);
             return $kayttaja;
         }
     }
 
-    public static function haeKaikkiYllapitajat() {
-        $sql = "SELECT tunnus, salasana FROM yllapitaja";
+    public static function haeKaikkiAsiakkaat() {
+        $sql = "SELECT tunnus, salasana FROM asiakas";
         $kysely = getTietokantayhteys()->prepare($sql);
         $kysely->execute();
 
         $tulokset = array();
         foreach ($kysely->fetchAll(PDO::FETCH_OBJ) as $tulos) {
-            $yllapitaja = new Yllapitaja();
-            $yllapitaja->setTunnus($tulos->tunnus);
-            $yllapitaja->setSalasana($tulos->salasana);
-            $tulokset[] = $yllapitaja;
+            $asiakas = new Asiakas();
+            $asiakas->setTunnus($tulos->tunnus);
+            $asiakas->setSalasana($tulos->salasana);
+            $tulokset[] = $asiakas;
         }
         return $tulokset;
     }
+
 }
