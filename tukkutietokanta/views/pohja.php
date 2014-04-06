@@ -17,6 +17,8 @@
                 <?php echo $data->success; ?>
             </div>
         <?php endif; ?>
-        <?php require 'views/' . $sivu; ?>
+
+        <?php require 'views/header.php'; ?>
+        <?php require 'views/' . $sivu . '.php'; ?>
     </body>
 </html>

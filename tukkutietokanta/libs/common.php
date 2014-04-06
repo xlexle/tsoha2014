@@ -1,12 +1,11 @@
 <?php
+
 session_start();
 
 function getTietokantayhteys() {
-    static $yhteys = null; //Muuttuja, jonka sisältö säilyy getTietokantayhteys-kutsujen välillä.
+    static $yhteys = null;
 
     if ($yhteys === null) {
-        //Tämä koodi suoritetaan vain kerran, sillä seuraavilla 
-        //funktion suorituskerroilla $yhteys-muuttujassa on sisältöä.
         $yhteys = new PDO('pgsql:');
         $yhteys->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
@@ -14,9 +13,16 @@ function getTietokantayhteys() {
     return $yhteys;
 }
 
-function naytaNakyma($sivu, $data = array()) {
+function siirryKontrolleriin($kontrolleri, $data = array()) {
+    $_SESSION['data'] = (object) $data;
+    header("Location: $kontrolleri.php");
+    exit();
+}
+
+function naytaNakyma($sivu, $tab, $data = array()) {
     $data = (object) $data;
     require 'views/pohja.php';
+    unset($_SESSION['data']);
     exit();
 }
 
@@ -29,7 +35,9 @@ function kirjautunutTunnuksella($tunnus) {
     }
 
     return false;
-}/*
+}
+
+/*
  * tarpeellinen?
  */
 
@@ -37,16 +45,42 @@ function kirjautunut() {
     if (isset($_SESSION['kirjautunut'])) {
         return true;
     }
-    
+
     return false;
 }
 
-function onAdminOikeudet($tunnus) {
-    if ($_SESSION['admin'] == true) {
+function kirjautumisTarkistus() {
+    if (!isset($_SESSION['kirjautunut'])) {
+        siirryKontrolleriin("kirjautuminen", array(
+            'error' => "Sivu vaatii sisäänkirjautumisen."
+        ));
+    }
+}
+
+function onYllapitaja() {
+    if ($_SESSION['admin']) {
         return true;
     }
-    
+
     return false;
-}/*
- * tarpeellinen?
- */
+}
+
+function yllapitajaTarkistus() {
+    if (!$_SESSION['admin']) {
+        siirryKontrolleriin("tuotevalikoima", array(
+            'error' => "Sivu vaatii ylläpitäjän oikeudet."
+        ));
+    }
+}
+
+function asiakasTarkistus() {
+    if ($_SESSION['admin']) {
+        siirryKontrolleriin("tuotevalikoima", array(
+            'error' => "Sivu vaatii asiakkaan kirjautumistunnukset."
+        ));
+    }
+}
+
+function pilkuton($merkkijono) {
+    return str_replace(",", ".", $merkkijono);
+}

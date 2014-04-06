@@ -17,7 +17,7 @@
             <li><a href="http://xlexle.users.cs.helsinki.fi/connectiontest.php">Connectiontest-ohjelma</a></li>
             <li><a href="http://xlexle.users.cs.helsinki.fi/html-demo/index.html">HTML-demosivujen etusivu</a></li>
             <li><a href="http://xlexle.users.cs.helsinki.fi/html-demo/kayttoliittymakartta.html">HTML-demosivujen linkitetty kartta</a></li>
-            <li><a href="http://xlexle.users.cs.helsinki.fi/listaustesti.php">Listaus kirjautumistunnuksista</a></li>
+            <li><a href="http://xlexle.users.cs.helsinki.fi/testi-kirjautumistiedot.php">Listaus kirjautumistunnuksista</a></li>
             <li><a href="http://xlexle.users.cs.helsinki.fi">Kirjautumissivu</a></li>
         </ul>
 

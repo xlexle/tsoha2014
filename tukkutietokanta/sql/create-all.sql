@@ -1,6 +1,6 @@
 create sequence asiakas_id start 1000;
-create sequence tilaus_id start 10000;
 create sequence tuote_id start 100000;
+create sequence tilaus_id start 10000000;
 
 create table asiakas(
 	tunnus integer DEFAULT nextval('asiakas_id') PRIMARY KEY,
@@ -22,9 +22,10 @@ create table tuote(
 	tuotenro integer DEFAULT nextval('tuote_id') PRIMARY KEY,
 	koodi varchar(25),
 	kuvaus varchar(50),
-	hinta dec(6,2),
+	valmistaja varchar(25),
+	hinta dec(9,2),
 	saldo integer DEFAULT 0,
-	tilauskynnys integer
+	tilauskynnys integer DEFAULT 0
 );
 
 create table tilaus(

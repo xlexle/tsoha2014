@@ -1,11 +1,9 @@
 <?php
+
 require_once "libs/common.php";
 
-if (kirjautunut()) {
-    naytaNakyma("tuotevalikoima.php", array(
-        'success' => "Olet kirjautunut sisään. Tervetuloa!",
-        'admin' => $_SESSION['admin']
-    ));
+if (!kirjautunut()) {
+    siirryKontrolleriin("kirjautuminen");
+} else {
+    siirryKontrolleriin("tuotevalikoima");
 }
-
-naytaNakyma("kirjautuminen.php");
