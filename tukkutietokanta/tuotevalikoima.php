@@ -6,51 +6,66 @@ kirjautumisTarkistus();
 
 switch ($_GET['haku']) {
     case "listaa":
-        $sivu = 1; $tuloksia = 5;
+        $sivu = 1;
+        $naytetaan = 5;
+
         if (isset($_GET['sivu'])) {
             $sivu = (int) $_GET['sivu'];
-            if ($sivu < 1) $sivu = 1;
+            if ($sivu < 1)
+                $sivu = 1;
+        } else {
+            $valmistaja = $_POST['valmistaja'];
+            $hinta_min = pilkuton($_POST['hinta_min']);
+            $hinta_max = pilkuton($_POST['hinta_max']);
+            $saldo_min = pilkuton($_POST['saldo_min']);
+
+            $_SESSION['ehdot'] = array(
+                'valmistaja' => $valmistaja,
+                'hinta_min' => $hinta_min,
+                'hinta_max' => $hinta_max,
+                'saldo_min' => $saldo_min
+            );
+
+            if ((!empty($hinta_min) && !is_numeric($hinta_min)) ||
+                    (!empty($hinta_max) && !is_numeric($hinta_max))) {
+                unset($_SESSION['hinta_min'], $_SESSION['hinta_max']);
+                siirryKontrolleriin("tuotevalikoima", array(
+                    'error' => "Haku epäonnistui, koska hinta ei ollut numero.",
+                    'valmistaja' => $valmistaja,
+                    'saldo_min' => $saldo_min
+                ));
+            }
         }
 
-        $valmistaja = $_POST['valmistaja'];
-        $hinta_min = pilkuton($_POST['hinta_min']);
-        $hinta_max = pilkuton($_POST['hinta_max']);
-        $saldo_min = pilkuton($_POST['saldo_min']);
-        $data = array(
-            'valmistaja' => $valmistaja,
-            'hinta_min' => $hinta_min,
-            'hinta_max' => $hinta_max,
-            'saldo_min' => $saldo_min,
-        );
+        listaaTuotteet($_SESSION['ehdot'], $sivu, $naytetaan);
         
-        if ((!empty($hinta_min) && !is_numeric($hinta_min)) ||
-                (!empty($hinta_min) && !is_numeric($hinta_max))) {
-            unset($data['hinta_min'], $data['hinta_max']);
-            $data['error'] = "Haku epäonnistui, koska hinta ei ollut numero.";
-            siirryKontrolleriin("tuotevalikoima", $data);
-        }
-        
-        $tuotelista = Tuote::haeTuotteet($valmistaja, $hinta_min, $hinta_max, $saldo_min, $sivu, $tuloksia);
-        $lukumaara = Tuote::laskeLukumaara($valmistaja, $hinta_min, $hinta_max, $saldo_min);
-        $sivuja = ceil($lukumaara/$tuloksia);
-        $rivi = $sivu*$tuloksia - ($tuloksia-1);
-
-        if (empty($tuotelista)) {
-            $data['error'] = "Haku ei tuottanut tuloksia.";
-            siirryKontrolleriin("tuotevalikoima", $data);
-        }
-
-        naytaNakyma("tuote_list", 1, array(
-            'tuotteet' => $tuotelista,
-            'sivu' => $sivu,
-            'lukumaara' => $lukumaara,
-            'sivuja' => $sivuja,
-            'rivi' => $rivi
-        ));
+    case "uusi":
+        unset($_SESSION['ehdot']);
+        siirryKontrolleriin("tuotevalikoima");
 
     case "avoimet":
         yllapitajaTarkistus();
         naytaNakyma("tuotevalikoima", 1, array('success' => "listataan tuotteet joista avoimia tilauksia..."));
+}
+
+function listaaTuotteet($ehdot, $sivu, $naytetaan) {
+    $tuotelista = Tuote::haeTuotteet($ehdot['valmistaja'], $ehdot['hinta_min'], $ehdot['hinta_max'], $ehdot['saldo_min'], $sivu, $naytetaan);
+    $tuloksia = Tuote::laskeLukumaara($ehdot['valmistaja'], $ehdot['hinta_min'], $ehdot['hinta_max'], $ehdot['saldo_min']);
+    $sivuja = ceil($tuloksia / $naytetaan);
+    $rivi = $sivu * $naytetaan - ($naytetaan - 1);
+
+    if (empty($tuotelista)) {
+        $data['error'] = "Haku ei tuottanut tuloksia.";
+        siirryKontrolleriin("tuotevalikoima", $data);
+    }
+
+    naytaNakyma("tuote_list", 1, array(
+        'tuotteet' => $tuotelista,
+        'sivu' => $sivu,
+        'tuloksia' => $tuloksia,
+        'sivuja' => $sivuja,
+        'rivi' => $rivi
+    ));
 }
 
 if (isset($_GET['tuotenro'])) {
@@ -61,7 +76,7 @@ if (isset($_GET['tuotenro'])) {
             'error' => "Haku epäonnistui, koska et antanut tuotenumeroa.",
         ));
     }
-    
+
     if (!is_numeric($tuotenro)) {
         siirryKontrolleriin("tuotevalikoima", array(
             'error' => "Haku epäonnistui. Tuotenumero saa sisältää vain numeroita.",

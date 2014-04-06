@@ -21,7 +21,6 @@ class Tuote {
 
     public static function etsiTuoteTuotenumerolla($tuotenro) {
         if (!is_numeric($tuotenro) || !(floor($tuotenro) == $tuotenro)) return null;
-
         $sql = "SELECT tuotenro, koodi, kuvaus, valmistaja, hinta, saldo, tilauskynnys
             FROM tuote WHERE tuotenro = ? LIMIT 1";
         $kysely = getTietokantayhteys()->prepare($sql);
@@ -39,32 +38,11 @@ class Tuote {
 
     public static function haeTuotteet($valmistaja, $hinta_min, $hinta_max, $saldo_min, $sivu, $tuloksia) {
         $sql = "SELECT tuotenro, koodi, kuvaus, valmistaja, hinta, saldo FROM tuote WHERE TRUE";
-        $parametrit = array();
-        
-        if ($valmistaja != "") {
-            $sql .= " AND valmistaja = ?";
-            $parametrit[] = $valmistaja;
-        }
-
-        if (is_numeric($hinta_min)) {
-            $sql .= " AND hinta >= ?";
-            $parametrit[] = $hinta_min;
-        }
-
-        if (is_numeric($hinta_max)) {
-            $sql .= " AND hinta <= ?";
-            $parametrit[] = $hinta_max;
-        }
-
-        if (is_numeric($saldo_min)) {
-            $sql .= " AND saldo >= ?";
-            $parametrit[] = floor($saldo_min);
-        }
-        
+        list($parametrit, $lisaasql) = self::maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min);
         $parametrit[] = $tuloksia;
         $parametrit[] = ($sivu-1)*$tuloksia;
-
-        $sql .= " ORDER BY valmistaja, koodi LIMIT ? OFFSET ?";
+        
+        $sql .= $lisaasql . " ORDER BY valmistaja, koodi LIMIT ? OFFSET ?";
         $kysely = getTietokantayhteys()->prepare($sql);
         $kysely->execute($parametrit);
 
@@ -79,59 +57,41 @@ class Tuote {
     
     public static function laskeLukumaara($valmistaja, $hinta_min, $hinta_max, $saldo_min) {
         $sql = "SELECT count(*) FROM tuote WHERE TRUE";
-        $parametrit = array();
+        list($parametrit, $lisaasql) = self::maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min);
         
-        if ($valmistaja != "") {
-            $sql .= " AND valmistaja = ?";
-            $parametrit[] = $valmistaja;
-        }
-
-        if (is_numeric($hinta_min)) {
-            $sql .= " AND hinta >= ?";
-            $parametrit[] = $hinta_min;
-        }
-
-        if (is_numeric($hinta_max)) {
-            $sql .= " AND hinta <= ?";
-            $parametrit[] = $hinta_max;
-        }
-
-        if (is_numeric($saldo_min)) {
-            $sql .= " AND saldo >= ?";
-            $parametrit[] = floor($saldo_min);
-        }
-        
+        $sql .= $lisaasql;
         $kysely = getTietokantayhteys()->prepare($sql);
         if (empty($parametrit)) $kysely->execute();
         else $kysely->execute($parametrit);
         return $kysely->fetchColumn();
     }
-//    
-//    private function maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min, &$sql) {
-//        $array = array();
-//        
-//        if ($valmistaja != "") {
-//            $sql .= " AND valmistaja = ?";
-//            $array[] = $valmistaja;
-//        }
-//
-//        if (is_numeric($hinta_min)) {
-//            $sql .= " AND hinta >= ?";
-//            $array[] = $hinta_min;
-//        }
-//
-//        if (is_numeric($hinta_max)) {
-//            $sql .= " AND hinta <= ?";
-//            $array[] = $hinta_max;
-//        }
-//
-//        if (is_numeric($saldo_min)) {
-//            $sql .= " AND saldo >= ?";
-//            $array[] = floor($saldo_min);
-//        }
-//        
-//        return $array;
-//    }
+    
+    private function maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min) {
+        $params = array();
+        $lisaasql = "";
+        
+        if ($valmistaja != "") {
+            $lisaasql .= " AND valmistaja = ?";
+            $params[] = $valmistaja;
+        }
+
+        if (is_numeric($hinta_min)) {
+            $lisaasql .= " AND hinta >= ?";
+            $params[] = $hinta_min;
+        }
+
+        if (is_numeric($hinta_max)) {
+            $lisaasql .= " AND hinta <= ?";
+            $params[] = $hinta_max;
+        }
+
+        if (is_numeric($saldo_min)) {
+            $lisaasql .= " AND saldo >= ?";
+            $params[] = floor($saldo_min);
+        }
+        
+        return array($params, $lisaasql);
+    }
 
     private function haettuTuote($tulos) {
         $tuote = new Tuote();

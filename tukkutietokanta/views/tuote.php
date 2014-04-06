@@ -24,7 +24,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="hinta" class="col-md-2 control-label">Hinta</label>
+                <label for="hinta" class="col-md-2 control-label">Hinta EUR</label>
                 <div class="col-md-2">
                     <input type="text" class="form-control" id="hinta" name="hinta" value="<?php echo $tuote->getHinta(); ?>"
                            <?php if (!$data->muokkaa): { ?> readonly<?php } endif; ?>>
