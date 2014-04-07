@@ -3,6 +3,7 @@
         <h2><?php $kpl = $data->tuloksia; echo $kpl; ?> hakutulos<?php if ($kpl != 1): {?>ta<?php } endif;?></h2><br>
     </div>
 
+    <?php if ($data->sivuja > 1): {?>
     <div class="row">
         <div class="btn-group">            
             <a <?php if ($data->sivu > 1): ?>
@@ -22,6 +23,7 @@
             </a>
         </div>
     </div>
+    <?php } endif; ?>
 
     <div class="row">
         <table class="table table-striped">
@@ -59,13 +61,18 @@
                     <?php if (onYllapitaja()): { ?>
                         <td><?php echo $tuote->getAvoimiaTilauksia(); ?></td>
                     <?php } endif; ?>
-                    <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-eye-open"></span></a></td>  
+                    <td><a href="tuotevalikoima.php?tuotenro=<?php echo $tuote->getTuotenro(); ?>" 
+                        class="btn btn-xs btn-default" target="_blank"><span class="glyphicon glyphicon-eye-open"></span></a></td>  
                     <?php if (onYllapitaja()): { ?>
-                        <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-wrench"></span></a></td>
-                        <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-th-list"></span> Avoimet tilaukset</a></td>
-                        <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-th-list"></span> Kaikki tilaukset</a></td>
+                        <td><a href="tuotevalikoima.php?muokkaa=<?php echo $tuote->getTuotenro(); ?>" 
+                            class="btn btn-xs btn-default" target="_blank"><span class="glyphicon glyphicon-wrench"></span></a></td>
+                        <td><a href="#" class="btn btn-xs btn-default"><span 
+                            class="glyphicon glyphicon-th-list" target="_blank"></span> Avoimet tilaukset</a></td>
+                        <td><a href="#" class="btn btn-xs btn-default"><span 
+                            class="glyphicon glyphicon-th-list" target="_blank"></span> Kaikki tilaukset</a></td>
                     <?php } else: { ?>
-                        <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span> Lisää tilaukselle</a></td>
+                        <td><a href="#" class="btn btn-xs btn-default"><span 
+                            class="glyphicon glyphicon-shopping-cart"></span> </a></td>
                     <?php } endif; ?>
                 </tr>
                 <?php endforeach; ?>

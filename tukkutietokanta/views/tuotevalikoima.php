@@ -55,7 +55,7 @@
             <div class="row">
                 <br>
                 <p><a class="btn btn-default" href="tuotevalikoima.php?haku=avoimet">Listaa tuotteet joista avoimia tilauksia</a></p>
-                <p><a class = "btn btn-default" href = "uusituote.php">Luo uusi tuote</a></p>
+                <p><a class = "btn btn-default" href = "tuotevalikoima.php?tuote=uusi">Uusi tuote</a></p>
             </div>
         <?php } endif; ?>
 </div>

@@ -15,7 +15,11 @@ function getTietokantayhteys() {
 
 function siirryKontrolleriin($kontrolleri, $data = array()) {
     $_SESSION['data'] = (object) $data;
-    header("Location: $kontrolleri.php");
+    if (!strpos($kontrolleri, ".php")) {
+        header("Location: $kontrolleri.php");
+    } else {
+        header("Location: $kontrolleri");
+    }
     exit();
 }
 
@@ -81,6 +85,11 @@ function asiakasTarkistus() {
     }
 }
 
-function pilkuton($merkkijono) {
-    return str_replace(",", ".", $merkkijono);
+function muunnahinnaksi($merkkijono) {
+    $luku = str_replace(",", ".", $merkkijono);
+    if (!is_numeric($luku)) {
+        return false;
+    }
+    
+    return round($luku, 2);
 }

@@ -15,30 +15,38 @@ switch ($_GET['haku']) {
                 $sivu = 1;
         } else {
             $valmistaja = $_POST['valmistaja'];
-            $hinta_min = pilkuton($_POST['hinta_min']);
-            $hinta_max = pilkuton($_POST['hinta_max']);
-            $saldo_min = pilkuton($_POST['saldo_min']);
+            $hinta_min = $_POST['hinta_min'];
+            $hinta_max = $_POST['hinta_max'];
+            $saldo_min = $_POST['saldo_min'];
 
-            $_SESSION['ehdot'] = array(
+            $ehdot = array(
                 'valmistaja' => $valmistaja,
-                'hinta_min' => $hinta_min,
-                'hinta_max' => $hinta_max,
                 'saldo_min' => $saldo_min
             );
 
-            if ((!empty($hinta_min) && !is_numeric($hinta_min)) ||
-                    (!empty($hinta_max) && !is_numeric($hinta_max))) {
-                unset($_SESSION['hinta_min'], $_SESSION['hinta_max']);
+            if ((!empty($hinta_min) && !muunnahinnaksi($hinta_min)) ||
+                    (!empty($hinta_max) && !muunnahinnaksi($hinta_max))) {
                 siirryKontrolleriin("tuotevalikoima", array(
                     'error' => "Haku epäonnistui, koska hinta ei ollut numero.",
                     'valmistaja' => $valmistaja,
                     'saldo_min' => $saldo_min
                 ));
             }
+
+            $ehdot['hinta_min'] = muunnahinnaksi($hinta_min);
+            $ehdot['hinta_max'] = muunnahinnaksi($hinta_max);
+            $_SESSION['ehdot'] = $ehdot;
+        }
+
+        /* suojataan tietylle sivulle siirtyminen URL:llä */
+        if (!isset($_SESSION['ehdot'])) {
+            siirryKontrolleriin("tuotevalikoima", array(
+                'error' => "Sivunvaihto epäonnistui, koska hakuehtoja ei ollut asetettu.",
+            ));
         }
 
         listaaTuotteet($_SESSION['ehdot'], $sivu, $naytetaan);
-        
+
     case "uusi":
         unset($_SESSION['ehdot']);
         siirryKontrolleriin("tuotevalikoima");
@@ -68,18 +76,19 @@ function listaaTuotteet($ehdot, $sivu, $naytetaan) {
     ));
 }
 
+/* Siirrytään tuotteen katseluun */
 if (isset($_GET['tuotenro'])) {
     $tuotenro = $_GET['tuotenro'];
 
     if (empty($tuotenro)) {
         siirryKontrolleriin("tuotevalikoima", array(
-            'error' => "Haku epäonnistui, koska et antanut tuotenumeroa.",
+            'error' => "Haku epäonnistui, koska tuotenumero puuttui.",
         ));
     }
 
     if (!is_numeric($tuotenro)) {
         siirryKontrolleriin("tuotevalikoima", array(
-            'error' => "Haku epäonnistui. Tuotenumero saa sisältää vain numeroita.",
+            'error' => "Haku epäonnistui, koska tuotenumero saa sisältää vain numeroita.",
         ));
     }
     $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
@@ -94,6 +103,7 @@ if (isset($_GET['tuotenro'])) {
     naytaNakyma("tuote", 1, array('tuote' => $tuote));
 }
 
+/* Siirrytään tuotteen muokkaustilaan */
 if (isset($_GET['muokkaa'])) {
     yllapitajaTarkistus();
     $tuotenro = $_GET['muokkaa'];
@@ -108,9 +118,12 @@ if (isset($_GET['muokkaa'])) {
     naytaNakyma("tuote", 1, array('tuote' => $tuote, 'muokkaa' => true));
 }
 
+/* Tallennetaan tuotteeseen tehdyt muutokset */
 if (isset($_GET['tallenna'])) {
     yllapitajaTarkistus();
     $tuotenro = $_GET['tallenna'];
+    $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
+    // tallennetaan muutokset tietokantaan
 
     if (empty($tuotenro)) {
         siirryKontrolleriin("tuotevalikoima", array(
@@ -119,6 +132,79 @@ if (isset($_GET['tallenna'])) {
     }
 
     naytaNakyma("tuote", 1, array('tuote' => $tuote));
+}
+
+switch ($_GET['tuote']) {
+    /* Siirrytään uuden tuotteen lomakkeeseen */
+    case "uusi":
+        yllapitajaTarkistus();
+        $data = (array) $_SESSION['data'];
+        naytaNakyma("tuote_new", 1, $data);
+
+    /* Tarkistetaan lomaketiedot ja tallennetaan uusi tuote */
+    case "perusta":
+        yllapitajaTarkistus();
+        $koodi = $_POST['koodi'];
+        $kuvaus = $_POST['kuvaus'];
+        $valmistaja = $_POST['valmistaja'];
+        $hinta = $_POST['hinta'];
+        $saldo = $_POST['saldo'];
+        $tilauskynnys = $_POST['tilauskynnys'];
+
+        $data = array(
+            'koodi' => $koodi,
+            'kuvaus' => $kuvaus,
+            'valmistaja' => $valmistaja,
+            'hinta' => $hinta,
+            'saldo' => $saldo,
+            'tilauskynnys' => $tilauskynnys
+        );
+
+        /* tarkistetaan POST-paluuarvot */
+        if (empty($koodi)) {
+            $data['error'] = "Tuotteen luonti epäonnistui, koska valmistajan tuotekoodi puuttui.";
+            siirryKontrolleriin("tuotevalikoima.php?tuote=uusi", $data);
+        }
+
+        if (empty($valmistaja)) {
+            $data['error'] = "Tuotteen luonti epäonnistui, koska valmistaja puuttui.";
+            siirryKontrolleriin("tuotevalikoima.php?tuote=uusi", $data);
+        }
+
+        if (empty($hinta)) {
+            $data['error'] = "Tuotteen luonti epäonnistui, koska hinta puuttui.";
+            siirryKontrolleriin("tuotevalikoima.php?tuote=uusi", $data);
+        }
+
+        if (!muunnahinnaksi($hinta)) {
+            unset($data['hinta']);
+            $data['error'] = "Tuotteen luonti epäonnistui, koska hinta ei ollut numero.";
+            siirryKontrolleriin("tuotevalikoima.php?tuote=uusi", $data);
+        }
+        $hinta = muunnahinnaksi($hinta);
+
+//        if (empty($kuvaus)) {
+//            $kuvaus = "";
+//        }
+
+        /* Luodaan uusi tuote tietokantaan */
+        $tuote = luoUusiTuoteOlio($koodi, $kuvaus, $valmistaja, $hinta, $saldo, $tilauskynnys);
+        $tuotenro = $tuote->lisaaKantaan();
+
+        siirryKontrolleriin("tuotevalikoima.php", array(
+            'success' => 'Tuote ' . $tuotenro . ' perustettu onnistuneesti.'
+        ));
+}
+
+function luoUusiTuoteOlio($koodi, $kuvaus, $valmistaja, $hinta, $saldo, $tilauskynnys) {
+    $tuote = new Tuote();
+    $tuote->setKoodi($koodi);
+    $tuote->setKuvaus($kuvaus);
+    $tuote->setValmistaja($valmistaja);
+    $tuote->setHinta($hinta);
+    $tuote->setSaldo($saldo);
+    $tuote->setTilauskynnys($tilauskynnys);
+    return $tuote;
 }
 
 naytaNakyma("tuotevalikoima", 1, $_SESSION['data']);
