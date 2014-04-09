@@ -25,7 +25,8 @@ create table tuote(
 	valmistaja varchar(25) NOT NULL,
 	hinta dec(9,2) NOT NULL,
 	saldo integer DEFAULT 0,
-	tilauskynnys integer DEFAULT 0
+	tilauskynnys integer DEFAULT 0,
+	poistettu timestamp
 );
 
 create table tilaus(

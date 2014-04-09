@@ -5,7 +5,7 @@
             <div class="form-group">
                 <label for="tuote" class="col-md-2 control-label">Tuote</label>
                 <div class="col-md-3">
-                    <input type="text" maxlength="25" class="form-control" id="tuote" name="tuote" value="<?php echo $data->tuote; ?>" placeholder="tuotenumero tai valmistajan koodi">
+                    <input type="text" maxlength="25" class="form-control" id="tuote" name="tuote" value="<?php echo $data->tuote;?>" placeholder="tuotenumero tai valmistajan koodi">
                 </div>
                 <div class="col-md-1">
                     <input type="number" min="1" class="form-control" id="kpl" name="kpl" placeholder="1 kpl">
@@ -37,13 +37,13 @@
             <tbody>
                 <?php $rivi = 0; foreach ($data->ostoskori as $ostos):?>
                     <tr>
-                        <td><?php echo++$rivi; ?></td>
-                        <td><?php echo $ostos->getTuotenro() ?></td>
-                        <td><?php echo $ostos->getKoodi(); ?></td>
-                        <td><?php echo $ostos->getValmistaja(); ?></td>
-                        <td><?php echo $ostos->getHinta(); ?></td>
-                        <td><?php echo $ostos->getMaara(); ?></td>
-                        <td><?php echo $ostos->getSaldo(); ?></td>
+                        <td><?php echo++$rivi;?></td>
+                        <td><?php echo $ostos->getTuotenro();?></td>
+                        <td><?php echo $ostos->getKoodi();?></td>
+                        <td><?php echo $ostos->getValmistaja();?></td>
+                        <td><?php echo $ostos->getHinta();?></td>
+                        <td><?php echo $ostos->getMaara();?></td>
+                        <td><?php echo $ostos->getSaldo();?></td>
                         <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-wrench"></span> Muuta kappalemäärää</a></td>
                         <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-remove"></span> Poista</a></td>
                     </tr>

@@ -18,10 +18,12 @@ switch ($_GET['haku']) {
             $hinta_min = $_POST['hinta_min'];
             $hinta_max = $_POST['hinta_max'];
             $saldo_min = $_POST['saldo_min'];
+            $poistettu = $_POST['poistettu'];
 
             $ehdot = array(
                 'valmistaja' => $valmistaja,
-                'saldo_min' => $saldo_min
+                'saldo_min' => $saldo_min,
+                'poistettu' => $poistettu
             );
 
             if ((!empty($hinta_min) && !muunnahinnaksi($hinta_min)) ||
@@ -38,10 +40,9 @@ switch ($_GET['haku']) {
             $_SESSION['ehdot'] = $ehdot;
         }
 
-        /* suojataan tietylle sivulle siirtyminen URL:llä */
         if (!isset($_SESSION['ehdot'])) {
             siirryKontrolleriin("tuotevalikoima", array(
-                'error' => "Sivunvaihto epäonnistui, koska hakuehtoja ei ollut asetettu.",
+                'error' => "Sivunvaihto epäonnistui, koska hakuehtoja ei ollut asetettu."
             ));
         }
 
@@ -57,23 +58,29 @@ switch ($_GET['haku']) {
 }
 
 function listaaTuotteet($ehdot, $sivu, $naytetaan) {
-    $tuotelista = Tuote::haeTuotteet($ehdot['valmistaja'], $ehdot['hinta_min'], $ehdot['hinta_max'], $ehdot['saldo_min'], $sivu, $naytetaan);
-    $tuloksia = Tuote::laskeLukumaara($ehdot['valmistaja'], $ehdot['hinta_min'], $ehdot['hinta_max'], $ehdot['saldo_min']);
+    $tuotelista = Tuote::haeTuotteet($ehdot['valmistaja'], $ehdot['hinta_min'], $ehdot['hinta_max'], $ehdot['saldo_min'], $ehdot['poistettu'], $sivu, $naytetaan);
+    $tuloksia = Tuote::laskeLukumaara($ehdot['valmistaja'], $ehdot['hinta_min'], $ehdot['hinta_max'], $ehdot['saldo_min'], $ehdot['poistettu']);
     $sivuja = ceil($tuloksia / $naytetaan);
     $rivi = $sivu * $naytetaan - ($naytetaan - 1);
 
     if (empty($tuotelista)) {
-        $data['error'] = "Haku ei tuottanut tuloksia.";
-        siirryKontrolleriin("tuotevalikoima", $data);
+        unset($_SESSION['ehdot']);
+        siirryKontrolleriin("tuotevalikoima", array('error' => "Haku ei tuottanut tuloksia."));
     }
 
-    naytaNakyma("tuote_list", 1, array(
+    $data = array(
         'tuotteet' => $tuotelista,
         'sivu' => $sivu,
         'tuloksia' => $tuloksia,
         'sivuja' => $sivuja,
         'rivi' => $rivi
-    ));
+    );
+
+    if ($ehdot['poistettu'] == 1) {
+        $data['poistettu'] = true;
+    }
+
+    naytaNakyma("tuote_list", 1, $data);
 }
 
 /* Siirrytään tuotteen katseluun */
@@ -82,13 +89,13 @@ if (isset($_GET['tuotenro'])) {
 
     if (empty($tuotenro)) {
         siirryKontrolleriin("tuotevalikoima", array(
-            'error' => "Haku epäonnistui, koska tuotenumero puuttui.",
+            'error' => "Haku epäonnistui, koska tuotenumero puuttui."
         ));
     }
 
     if (!is_numeric($tuotenro)) {
         siirryKontrolleriin("tuotevalikoima", array(
-            'error' => "Haku epäonnistui, koska tuotenumero saa sisältää vain numeroita.",
+            'error' => "Haku epäonnistui, koska tuotenumero saa sisältää vain numeroita."
         ));
     }
     $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
@@ -100,7 +107,21 @@ if (isset($_GET['tuotenro'])) {
         ));
     }
 
-    naytaNakyma("tuote", 1, array('tuote' => $tuote));
+    $data = (array) $_SESSION['data'];
+    $data['tuote'] = $tuote;
+    
+    $poistettu = (string) $tuote->getPoistettu();
+    if (!empty($poistettu)) {
+        if (!$_SESSION['admin']) {
+            siirryKontrolleriin("tuotevalikoima", array(
+                'error' => 'Tuote ' . $tuotenro . ' on poistettu valikoimasta.'
+            ));
+        }
+        
+        $data['poistettu'] = true;
+    }
+
+    naytaNakyma("tuote", 1, $data);
 }
 
 /* Siirrytään tuotteen muokkaustilaan */
@@ -108,14 +129,18 @@ if (isset($_GET['muokkaa'])) {
     yllapitajaTarkistus();
     $tuotenro = $_GET['muokkaa'];
     $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
-
+    
     if (empty($tuotenro) || is_null($tuote)) {
         siirryKontrolleriin("tuotevalikoima", array(
             'error' => "Tuotetta ei löytynyt.",
         ));
     }
+    
+    $data = (array) $_SESSION['data'];
+    $data['tuote'] = $tuote;
+    $data['muokkaa'] = true;
 
-    naytaNakyma("tuote", 1, array('tuote' => $tuote, 'muokkaa' => true));
+    naytaNakyma("tuote", 1, $data);
 }
 
 /* Tallennetaan tuotteeseen tehdyt muutokset */
@@ -123,15 +148,101 @@ if (isset($_GET['tallenna'])) {
     yllapitajaTarkistus();
     $tuotenro = $_GET['tallenna'];
     $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
-    // tallennetaan muutokset tietokantaan
-
-    if (empty($tuotenro)) {
+    
+    if (empty($tuotenro) || is_null($tuote)) {
         siirryKontrolleriin("tuotevalikoima", array(
             'error' => "Tuotetta ei löytynyt.",
         ));
     }
 
-    naytaNakyma("tuote", 1, array('tuote' => $tuote));
+    $koodi = $_POST['koodi'];
+    $kuvaus = $_POST['kuvaus'];
+    $valmistaja = $_POST['valmistaja'];
+    $hinta = $_POST['hinta'];
+    $saldo = $_POST['saldo'];
+    $tilauskynnys = $_POST['tilauskynnys'];
+
+    $data = array(
+        'koodi' => $koodi,
+        'kuvaus' => $kuvaus,
+        'valmistaja' => $valmistaja,
+        'hinta' => $hinta,
+        'saldo' => $saldo,
+        'tilauskynnys' => $tilauskynnys
+    );
+
+    tarkistaTallennusLomake($data, 'muokkaa=' . $tuotenro);
+
+    $hinta = muunnahinnaksi($hinta);
+
+    /* Luodaan uusi tuote tietokantaan */
+    $paivitettavaTuote = luoUusiTuoteOlio($koodi, $kuvaus, $valmistaja, $hinta, $saldo, $tilauskynnys);
+    $paivitettavaTuote->setTuotenro($tuotenro);
+    if ($paivitettavaTuote->paivitaKantaan()) {
+        siirryKontrolleriin("tuotevalikoima.php", array(
+            'success' => 'Tuote ' . $tuotenro . ' on päivitetty onnistuneesti.'
+        ));
+    }
+
+    siirryKontrolleriin("tuotevalikoima", array(
+        'error' => 'Virhe tietokantaoperaatiossa päivitettäessä tuotetta ' . $tuotenro
+    ));
+}
+
+if (isset($_GET['poista'])) {
+    yllapitajaTarkistus();
+    $tuotenro = $_GET['poista'];
+    $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
+    
+    if (empty($tuotenro) || is_null($tuote)) {
+        siirryKontrolleriin("tuotevalikoima", array(
+            'error' => "Tuotetta ei löytynyt.",
+        ));
+    }
+
+    if (Tuote::onPoistettu($tuotenro)) {
+        siirryKontrolleriin("tuotevalikoima", array(
+            'error' => 'Tuote ' . $tuotenro . ' on jo poistettu valikoimasta.'
+        ));
+    }
+
+    if (Tuote::poistaValikoimasta($tuotenro)) {
+        siirryKontrolleriin('tuotevalikoima.php?tuotenro=' . $tuotenro, array(
+            'success' => "Tuotteen poisto valikoimasta onnistui."
+        ));
+    }
+
+    siirryKontrolleriin("tuotevalikoima", array(
+        'error' => 'Virhe tietokantaoperaatiossa poistettaessa tuotetta ' . $tuotenro
+    ));
+}
+
+if (isset($_GET['poistafinal'])) {
+    yllapitajaTarkistus();
+    $tuotenro = $_GET['poistafinal'];
+    $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
+    
+    if (empty($tuotenro) || is_null($tuote)) {
+        siirryKontrolleriin("tuotevalikoima", array(
+            'error' => "Tuotetta ei löytynyt.",
+        ));
+    }
+
+    if (!Tuote::onPoistettu($tuotenro)) {
+        siirryKontrolleriin('tuotevalikoima.php?muokkaa=' . $tuotenro, array(
+            'error' => 'Tuotetta ' . $tuotenro . ' ei voida poistaa lopullisesti, sillä tuote on vielä valikoimassa.',
+        ));
+    }
+
+    if (Tuote::poistaLopullisesti($tuotenro)) {
+        siirryKontrolleriin("tuotevalikoima", array(
+            'success' => "Tuotteen lopullinen poisto tietokannasta onnistui."
+        ));
+    }
+
+    siirryKontrolleriin("tuotevalikoima", array(
+        'error' => 'Virhe tietokantaoperaatiossa poistettaessa tuotetta ' . $tuotenro
+    ));
 }
 
 switch ($_GET['tuote']) {
@@ -160,40 +271,40 @@ switch ($_GET['tuote']) {
             'tilauskynnys' => $tilauskynnys
         );
 
-        /* tarkistetaan POST-paluuarvot */
-        if (empty($koodi)) {
-            $data['error'] = "Tuotteen luonti epäonnistui, koska valmistajan tuotekoodi puuttui.";
-            siirryKontrolleriin("tuotevalikoima.php?tuote=uusi", $data);
-        }
+        tarkistaTallennusLomake($data, "tuote=uusi");
 
-        if (empty($valmistaja)) {
-            $data['error'] = "Tuotteen luonti epäonnistui, koska valmistaja puuttui.";
-            siirryKontrolleriin("tuotevalikoima.php?tuote=uusi", $data);
-        }
-
-        if (empty($hinta)) {
-            $data['error'] = "Tuotteen luonti epäonnistui, koska hinta puuttui.";
-            siirryKontrolleriin("tuotevalikoima.php?tuote=uusi", $data);
-        }
-
-        if (!muunnahinnaksi($hinta)) {
-            unset($data['hinta']);
-            $data['error'] = "Tuotteen luonti epäonnistui, koska hinta ei ollut numero.";
-            siirryKontrolleriin("tuotevalikoima.php?tuote=uusi", $data);
-        }
         $hinta = muunnahinnaksi($hinta);
 
-//        if (empty($kuvaus)) {
-//            $kuvaus = "";
-//        }
-
         /* Luodaan uusi tuote tietokantaan */
-        $tuote = luoUusiTuoteOlio($koodi, $kuvaus, $valmistaja, $hinta, $saldo, $tilauskynnys);
-        $tuotenro = $tuote->lisaaKantaan();
+        $uusiTuote = luoUusiTuoteOlio($koodi, $kuvaus, $valmistaja, $hinta, $saldo, $tilauskynnys);
+        $tuotenro = $uusiTuote->lisaaKantaan();
 
         siirryKontrolleriin("tuotevalikoima.php", array(
-            'success' => 'Tuote ' . $tuotenro . ' perustettu onnistuneesti.'
+            'success' => 'Tuote ' . $tuotenro . ' on perustettu onnistuneesti.'
         ));
+}
+
+function tarkistaTallennusLomake($data, $get) {
+    if (empty($data['koodi'])) {
+        $data['error'] = "Tallennus epäonnistui, koska valmistajan tuotekoodi puuttui.";
+        siirryKontrolleriin('tuotevalikoima.php?' . $get, $data);
+    }
+
+    if (empty($data['valmistaja'])) {
+        $data['error'] = "Tallennus epäonnistui, koska valmistaja puuttui.";
+        siirryKontrolleriin('tuotevalikoima.php?' . $get, $data);
+    }
+
+    if (empty($data['hinta'])) {
+        $data['error'] = "Tallennus epäonnistui, koska hinta puuttui.";
+        siirryKontrolleriin('tuotevalikoima.php?' . $get, $data);
+    }
+
+    if (!muunnahinnaksi($data['hinta'])) {
+        unset($data['hinta']);
+        $data['error'] = "Tallennus epäonnistui, koska hinta ei ollut numero.";
+        siirryKontrolleriin('tuotevalikoima.php?' . $get, $data);
+    }
 }
 
 function luoUusiTuoteOlio($koodi, $kuvaus, $valmistaja, $hinta, $saldo, $tilauskynnys) {

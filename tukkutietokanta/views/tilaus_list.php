@@ -35,14 +35,14 @@
                     <?php $rivi = 0; foreach ($data->tuotteet as $tuote):?>
                         <tr>
                             <td><?php echo++$rivi; ?></td>
-                            <td><?php echo $tuote->getTuotenro() ?></td>
-                            <td><?php echo $tuote->getKoodi(); ?></td>
-                            <td><?php echo $tuote->getKuvaus(); ?></td>
-                            <td><?php echo $tuote->getValmistaja(); ?></td>
-                            <td><?php echo $tuote->getSaldo(); ?></td>
-                            <td><?php echo $tuote->getHinta(); ?></td>
+                            <td><?php echo $tuote->getTuotenro()?></td>
+                            <td><?php echo $tuote->getKoodi();?></td>
+                            <td><?php echo $tuote->getKuvaus();?></td>
+                            <td><?php echo $tuote->getValmistaja();?></td>
+                            <td><?php echo $tuote->getSaldo();?></td>
+                            <td><?php echo $tuote->getHinta();?></td>
                             <?php if (onYllapitaja()): { ?>
-                                <td><?php echo $tuote->getAvoimiaTilauksia(); ?></td>
+                                <td><?php echo $tuote->getAvoimiaTilauksia();?></td>
                             <?php } endif; ?>
                             <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-eye-open"></span></a></td>  
                             <?php if (onYllapitaja()): { ?>

@@ -12,6 +12,7 @@ class Tuote {
     protected $saldo;
     private $tilauskynnys;
     private $avoimiaTilauksia = 0; /* placeholder value */
+    private $poistettu;
 
     public function __construct() {
         
@@ -22,7 +23,7 @@ class Tuote {
     public static function etsiTuoteTuotenumerolla($tuotenro) {
         if (!is_numeric($tuotenro) || !(floor($tuotenro) == $tuotenro))
             return null;
-        $sql = "SELECT tuotenro, koodi, kuvaus, valmistaja, hinta, saldo, tilauskynnys
+        $sql = "SELECT tuotenro, koodi, kuvaus, valmistaja, hinta, saldo, tilauskynnys, poistettu
             FROM tuote WHERE tuotenro = ? LIMIT 1";
         $kysely = getTietokantayhteys()->prepare($sql);
         $kysely->execute(array($tuotenro));
@@ -37,9 +38,10 @@ class Tuote {
         }
     }
 
-    public static function haeTuotteet($valmistaja, $hinta_min, $hinta_max, $saldo_min, $sivu, $tuloksia) {
-        $sql = "SELECT tuotenro, koodi, kuvaus, valmistaja, hinta, saldo FROM tuote WHERE TRUE";
-        list($parametrit, $lisaasql) = self::maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min);
+    public static function haeTuotteet($valmistaja, $hinta_min, $hinta_max, $saldo_min, $poistettu, $sivu, $tuloksia) {
+        $sql = "SELECT tuotenro, koodi, kuvaus, valmistaja, hinta, saldo, poistettu
+            FROM tuote WHERE TRUE";
+        list($parametrit, $lisaasql) = self::maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min, $poistettu);
         $parametrit[] = $tuloksia;
         $parametrit[] = ($sivu - 1) * $tuloksia;
 
@@ -56,9 +58,9 @@ class Tuote {
         return $tulokset;
     }
 
-    public static function laskeLukumaara($valmistaja, $hinta_min, $hinta_max, $saldo_min) {
+    public static function laskeLukumaara($valmistaja, $hinta_min, $hinta_max, $saldo_min, $poistettu) {
         $sql = "SELECT count(*) FROM tuote WHERE TRUE";
-        list($parametrit, $lisaasql) = self::maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min);
+        list($parametrit, $lisaasql) = self::maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min, $poistettu);
 
         $sql .= $lisaasql;
         $kysely = getTietokantayhteys()->prepare($sql);
@@ -69,7 +71,7 @@ class Tuote {
         return $kysely->fetchColumn();
     }
 
-    private function maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min) {
+    private function maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min, $poistettu) {
         $params = array();
         $lisaasql = "";
 
@@ -93,6 +95,12 @@ class Tuote {
             $params[] = floor($saldo_min);
         }
 
+        if ($poistettu == 1) {
+            $lisaasql .= " AND poistettu IS NOT NULL";
+        } else {
+            $lisaasql .= " AND poistettu IS NULL";
+        }
+
         return array($params, $lisaasql);
     }
 
@@ -104,11 +112,12 @@ class Tuote {
         $tuote->setValmistaja($tulos->valmistaja);
         $tuote->setHinta($tulos->hinta);
         $tuote->setSaldo($tulos->saldo);
+        $tuote->setPoistettu((string) $tulos->poistettu);
         return $tuote;
     }
 
     public function lisaaKantaan() {
-        $sql = "INSERT INTO Tuote (koodi, kuvaus, valmistaja, hinta, saldo, tilauskynnys)
+        $sql = "INSERT INTO tuote (koodi, kuvaus, valmistaja, hinta, saldo, tilauskynnys)
                             VALUES(?, ?, ?, ?, ?, ?) RETURNING tuotenro";
         $kysely = getTietokantayhteys()->prepare($sql);
 
@@ -124,6 +133,44 @@ class Tuote {
             $this->setTuotenro($kysely->fetchColumn());
         }
         return $this->tuotenro;
+    }
+
+    public function paivitaKantaan() {
+        $sql = "UPDATE tuote SET koodi = ?, kuvaus = ?, valmistaja = ?, 
+            hinta = ?, saldo = ?, tilauskynnys = ?
+            WHERE tuotenro = ?";
+        $kysely = getTietokantayhteys()->prepare($sql);
+
+        $ok = $kysely->execute(array(
+            $this->getKoodi(),
+            $this->getKuvaus(),
+            $this->getValmistaja(),
+            $this->getHinta(),
+            $this->getSaldo(),
+            $this->getTilauskynnys(),
+            $this->getTuotenro()
+        ));
+
+        return $ok;
+    }
+
+    public static function onPoistettu($tuotenro) {
+        $sql = "SELECT * FROM tuote WHERE tuotenro = ? AND poistettu IS NOT NULL LIMIT 1";
+        $kysely = getTietokantayhteys()->prepare($sql);
+        $kysely->execute(array($tuotenro));
+        return $kysely->fetchColumn();
+    }
+
+    public static function poistaValikoimasta($tuotenro) {
+        $sql = "UPDATE tuote SET poistettu = LOCALTIMESTAMP WHERE tuotenro = ?";
+        $kysely = getTietokantayhteys()->prepare($sql);
+        return $kysely->execute(array($tuotenro));
+    }
+
+    public static function poistaLopullisesti($tuotenro) {
+        $sql = "DELETE FROM tuote WHERE tuotenro = ?";
+        $kysely = getTietokantayhteys()->prepare($sql);
+        return $kysely->execute(array($tuotenro));
     }
 
     /* Getterit ja setterit */
@@ -190,6 +237,14 @@ class Tuote {
 
     public function setAvoimiaTilauksia($avoimiaTilauksia) {
         $this->avoimiaTilauksia = $avoimiaTilauksia;
+    }
+
+    public function getPoistettu() {
+        return $this->poistettu;
+    }
+
+    public function setPoistettu($poistettu) {
+        $this->poistettu = $poistettu;
     }
 
 }

@@ -30,21 +30,6 @@ function naytaNakyma($sivu, $tab, $data = array()) {
     exit();
 }
 
-function kirjautunutTunnuksella($tunnus) {
-    if (isset($_SESSION['kirjautunut'])) {
-        $kayttaja = $_SESSION['kayttaja'];
-        if ($kayttaja == $tunnus) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/*
- * tarpeellinen?
- */
-
 function kirjautunut() {
     if (isset($_SESSION['kirjautunut'])) {
         return true;
