@@ -18,8 +18,7 @@
 
     <div class="row">
         <br>
-        <p><a class="btn btn-default" href="asiakashallinta.php?haku=kaikki">Listaa kaikki asiakkaat</a></p>
-        <p><a class="btn btn-default" href="asiakashallinta.php?haku=luotto">Listaa luottolimiitin ylittäneet asiakkaat</a></p>
-        <p><a class="btn btn-default" href="uusiasiakas.php">Perusta uusi asiakas</a></p>
+        <p><a class="btn btn-default" href="asiakashallinta.php?haku=listaa">Hae kaikki asiakkaat</a></p>
+        <p><a class="btn btn-default" href="asiakashallinta.php?asiakas=uusi">Perusta uusi asiakas</a></p>
     </div>
 </div>

@@ -51,7 +51,7 @@
                 <div class="form-group">
                     <label for="poistettu" class="col-md-2 control-label">Poistettu</label>
                     <div class="col-md-2">
-                        <input type="text" class="form-control" id="poistettu" name="poistettu" value="<?php echo $tuote->getPoistettu();?>" readonly>
+                        <input type="text" class="form-control" id="poistettu" name="poistettu" value="<?php echo formatoi($tuote->getPoistettu());?>" readonly>
                     </div>
                 </div>
             <?php } endif; ?>
@@ -73,7 +73,7 @@
             </form>
         <?php } endif; ?>
         <?php if (!onYllapitaja()): { ?>
-            <form class="form-horizontal" action="#=<?php echo $tuote->getTuotenro();?>" method="POST">
+            <form class="form-horizontal" action="ostoskori.php?lisaaostos=<?php echo $tuote->getTuotenro();?>" method="POST">
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-4">
                         <button type="submit" class="btn btn-default">Lisää ostoskoriin</button>
@@ -97,6 +97,13 @@
                 </div>
             </form>
         <?php } elseif ($data->poistettu): {?>
+            <form class="form-horizontal" action="tuotevalikoima.php?palauta=<?php echo $tuote->getTuotenro();?>" method="POST">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-4">
+                        <button type="submit" class="btn btn-default">Palauta tuote valikoimaan</button>
+                    </div>
+                </div>
+            </form>
             <form class="form-horizontal" action="tuotevalikoima.php?poistafinal=<?php echo $tuote->getTuotenro();?>" method="POST">
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-4">
@@ -105,12 +112,14 @@
                 </div>
             </form>
         <?php } endif; ?>
-        <form class="form-horizontal" action="tuotevalikoima.php" method="POST">
-            <div class="form-group">
-                <div class="col-md-offset-2 col-md-4">
-                    <button type="submit" class="btn btn-default">Uusi haku</button>
+        <?php if (!$data->muokkaa): { ?>
+            <form class="form-horizontal" action="tuotevalikoima.php" method="POST">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-4">
+                        <button type="submit" class="btn btn-default">Uusi haku</button>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        <?php } endif; ?>
     </div>
 </div>

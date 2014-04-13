@@ -5,12 +5,12 @@ create sequence tilaus_id start 10000001;
 create table asiakas(
 	tunnus integer DEFAULT nextval('asiakas_id') PRIMARY KEY,
 	salasana varchar(16) NOT NULL,
-	yritysnimi varchar(25) NOT NULL,
+	yritysnimi varchar(50) NOT NULL,
 	osoite varchar(100) NOT NULL,
 	email varchar(50) NOT NULL,
 	yhteyshenkilo varchar(50) NOT NULL,
 	puhelinnumero varchar(25) NOT NULL,
-	luottoraja decimal(6,0) DEFAULT 1000.00
+	luottoraja decimal(9,0) DEFAULT 1000
 );
 
 create table yllapitaja(
@@ -25,25 +25,28 @@ create table tuote(
 	valmistaja varchar(25) NOT NULL,
 	hinta dec(9,2) NOT NULL,
 	saldo integer DEFAULT 0,
-	tilauskynnys integer DEFAULT 0,
+	tilauskynnys integer,
 	poistettu timestamp
 );
 
 create table tilaus(
 	tilausnro integer DEFAULT nextval('tilaus_id') PRIMARY KEY,
-	kokonaisarvo dec(6,2),
+	ostoviite varchar(50),
+	kokonaisarvo dec(9,2),
 	saapumisaika timestamp NOT NULL DEFAULT localtimestamp,
 	toimitettu timestamp,
 	laskutettu timestamp,
 	maksettu timestamp,
-	asiakasnro integer REFERENCES asiakas ON DELETE RESTRICT
+	asiakasnro integer REFERENCES asiakas
 );
 
 create table ostos(
-	tilausnro integer REFERENCES tilaus ON DELETE RESTRICT,
+	tilausnro integer REFERENCES tilaus ON DELETE CASCADE,
 	tuotenro integer REFERENCES tuote ON DELETE RESTRICT,
+	tilausrivi integer NOT NULL,
+	ostohinta dec(9,2) NOT NULL,
 	maara integer NOT NULL,
 	peruttu timestamp,
 	CONSTRAINT pk_ostos 
-		PRIMARY KEY (tilausnro, tuotenro)
+		PRIMARY KEY (tilausnro, tuotenro, tilausrivi)
 );

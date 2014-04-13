@@ -1,6 +1,6 @@
 <?php
 
-require_once "libs/common.php";
+require_once "libs/yhteys.php";
 
 class Yllapitaja {
 
@@ -28,7 +28,7 @@ class Yllapitaja {
         $this->salasana = $salasana;
     }
 
-    public static function etsiYllapitajaTunnuksilla($tunnus, $salasana) {
+    public static function etsiKirjautuja($tunnus, $salasana) {
         $sql = "SELECT tunnus, salasana FROM yllapitaja WHERE tunnus = ? AND salasana = ? LIMIT 1";
         $kysely = getTietokantayhteys()->prepare($sql);
         $kysely->execute(array($tunnus, $salasana));
@@ -45,7 +45,7 @@ class Yllapitaja {
     }
 
     public static function haeKaikkiYllapitajat() {
-        $sql = "SELECT tunnus, salasana FROM yllapitaja";
+        $sql = "SELECT tunnus, salasana FROM yllapitaja ORDER BY tunnus";
         $kysely = getTietokantayhteys()->prepare($sql);
         $kysely->execute();
 

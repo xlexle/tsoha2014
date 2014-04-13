@@ -4,25 +4,25 @@
     </div>
 
     <?php if ($data->sivuja > 1): {?>
-    <div class="row">
-        <div class="btn-group">            
-            <a <?php if ($data->sivu > 1): ?>
-                href="tuotevalikoima.php?haku=listaa&sivu=<?php echo $data->sivu - 1; ?>"
-                <?php endif; ?> class="btn btn-default" 
-                <?php if ($data->sivu == 1): ?>disabled<?php endif; ?>>
-                <span class="glyphicon glyphicon-arrow-left"></span>
-            </a>
-            <button class="btn btn-success" disabled>
-                sivu <?php echo $data->sivu; ?> / <?php echo $data->sivuja; ?>
-            </button>
-            <a <?php if ($data->sivu < $data->sivuja): ?>
-                    href="tuotevalikoima.php?haku=listaa&sivu=<?php echo $data->sivu + 1; ?>"
-                <?php endif; ?> class="btn btn-default"
-                <?php if ($data->sivu >= $data->sivuja): ?>disabled<?php endif; ?>>
-                <span class="glyphicon glyphicon-arrow-right"></span>
-            </a>
+        <div class="row">
+            <div class="btn-group">            
+                <a <?php if ($data->sivu > 1): ?>
+                    href="tuotevalikoima.php?haku=listaa&sivu=<?php echo $data->sivu - 1; ?>"
+                    <?php endif; ?> class="btn btn-default" 
+                    <?php if ($data->sivu == 1): ?>disabled<?php endif; ?>>
+                    <span class="glyphicon glyphicon-arrow-left"></span>
+                </a>
+                <button class="btn btn-success" disabled>
+                    sivu <?php echo $data->sivu; ?> / <?php echo $data->sivuja; ?>
+                </button>
+                <a <?php if ($data->sivu < $data->sivuja): ?>
+                        href="tuotevalikoima.php?haku=listaa&sivu=<?php echo $data->sivu + 1; ?>"
+                    <?php endif; ?> class="btn btn-default"
+                    <?php if ($data->sivu >= $data->sivuja): ?>disabled<?php endif; ?>>
+                    <span class="glyphicon glyphicon-arrow-right"></span>
+                </a>
+            </div>
         </div>
-    </div>
     <?php } endif; ?>
 
     <div class="row">
@@ -68,7 +68,7 @@
                     <td><?php echo $tuote->getHinta();?></td>
                     <?php if (onYllapitaja()): { ?>
                         <?php if ($data->poistettu): { ?>
-                            <td><?php echo $tuote->getPoistettu();?></td>
+                            <td><?php echo formatoi($tuote->getPoistettu());?></td>
                         <?php } else: { ?>
                             <td><?php echo $tuote->getAvoimiaTilauksia();?></td>
                         <?php } endif; ?>
@@ -93,8 +93,8 @@
                             </a>
                         </td>
                     <?php } else: { ?>
-                        <td><a href="#" class="btn btn-xs btn-default"><span 
-                            class="glyphicon glyphicon-shopping-cart"></span> 
+                        <td><a href="ostoskori.php?lisaaostos=<?php echo $tuote->getTuotenro();?>" class="btn btn-xs btn-default"><span 
+                            class="glyphicon glyphicon-shopping-cart" target="_blank"></span> 
                             </a>
                         </td>
                     <?php } endif; ?>

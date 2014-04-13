@@ -7,7 +7,7 @@
         <div class="row">
             <div class="btn-group">            
                 <a <?php if ($data->sivu > 1): ?>
-                    href="tilausseuranta.php?haku=listaa&sivu=<?php echo $data->sivu - 1; ?>"
+                    href="asiakashallinta.php?haku=listaa&sivu=<?php echo $data->sivu - 1; ?>"
                     <?php endif; ?> class="btn btn-default" 
                     <?php if ($data->sivu == 1): ?>disabled<?php endif; ?>>
                     <span class="glyphicon glyphicon-arrow-left"></span>
@@ -16,7 +16,7 @@
                     sivu <?php echo $data->sivu; ?> / <?php echo $data->sivuja; ?>
                 </button>
                 <a <?php if ($data->sivu < $data->sivuja): ?>
-                        href="tilausseuranta.php?haku=listaa&sivu=<?php echo $data->sivu + 1; ?>"
+                        href="asiakashallinta.php?haku=listaa&sivu=<?php echo $data->sivu + 1; ?>"
                     <?php endif; ?> class="btn btn-default"
                     <?php if ($data->sivu >= $data->sivuja): ?>disabled<?php endif; ?>>
                     <span class="glyphicon glyphicon-arrow-right"></span>
@@ -30,35 +30,43 @@
             <thead>
                 <tr>
                     <th>&nbsp;</th>
-                    <th>Tilausnumero</th>
-                    <th>Ostoviite</th>
-                    <th>Asiakasnumero</th>
-                    <th>Arvo (EUR)</th>
-                    <th>Luotu</th>
+                    <th>Tunnus</th>
+                    <th>Yritysnimi</th>
+                    <th>Email</th>
+                    <th>Puhelinnumero</th>
+                    <th>Luottoraja EUR</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                 </tr>
             </thead>
             <tbody>
                 <?php $rivi = $data->rivi;
-                foreach ($data->tilaukset as $tilaus):?>
+                foreach ($data->asiakkaat as $asiakas):?>
                 <tr>
                     <td><?php echo $rivi++;?></td>
-                    <td><?php echo $tilaus->getTilausnro();?></td>
-                    <td><?php echo $tilaus->getOstoviite();?></td>
-                    <td><?php echo $tilaus->getAsiakasnro();?></td>
-                    <td><?php echo $tilaus->getKokonaisarvo();?></td>
-                    <td><?php echo formatoi($tilaus->getSaapumisaika());?></td>
-                    <td><a href="tilausseuranta.php?tilausnro=<?php echo $tilaus->getTilausnro();?>"
+                    <td><?php echo $asiakas->getTunnus();?></td>
+                    <td><?php echo $asiakas->getYritysnimi();?></td>
+                    <td><?php echo $asiakas->getEmail();?></td>
+                    <td><?php echo $asiakas->getPuhelinnumero();?></td>
+                    <td><?php echo $asiakas->getLuottoraja();?></td>
+                    <td><a href="asiakashallinta.php?asiakasnro=<?php echo $asiakas->getTunnus();?>"
                         class="btn btn-xs btn-default" target="_blank"><span class="glyphicon glyphicon-eye-open"></span>
                         </a>
                     </td>
-                    <?php if (onYllapitaja()): { ?>
-                        <td><a href="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" 
-                            class="btn btn-xs btn-default" target="_blank"><span class="glyphicon glyphicon-wrench"></span>
-                            </a>
-                        </td>
-                    <?php } endif; ?>
+                    <td><a href="asiakashallinta.php?muokkaa=<?php echo $asiakas->getTunnus();?>" 
+                        class="btn btn-xs btn-default" target="_blank"><span class="glyphicon glyphicon-wrench"></span>
+                        </a>
+                    </td>
+                    <td><a href="#" class="btn btn-xs btn-default"><span 
+                        class="glyphicon glyphicon-th-list" target="_blank"></span> Avoimet tilaukset
+                        </a>
+                    </td>
+                    <td><a href="#" class="btn btn-xs btn-default"><span 
+                        class="glyphicon glyphicon-th-list" target="_blank"></span> Kaikki tilaukset
+                        </a>
+                    </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -66,6 +74,6 @@
     </div>
 
     <div class="row">
-        <p><a class = "btn btn-default" href = "tilausseuranta.php?haku=uusi">Uusi haku</a></p>
+        <p><a class = "btn btn-default" href = "asiakashallinta.php">Uusi haku</a></p>
     </div>
 </div>

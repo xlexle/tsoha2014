@@ -22,7 +22,7 @@
                     <input type="text" class="form-control" id="tuotenro" name="tuotenro" placeholder="6 numeroa">
                 </div>
             </div>
-            <div class="form-group">
+<!--            <div class="form-group">
                 <label for="luontipvm_min" class="col-md-2 control-label">Luotu</label>
                 <div class="col-md-2">
                     <input type="date" class="form-control" id="luontipvm_min" name="luontipvm_min">
@@ -30,32 +30,26 @@
                 <div class="col-md-2">
                     <input type="date" class="form-control" id="luontipvm_max" name="luontipvm_max">
                 </div>
-            </div>
+            </div>-->
             <div class="form-group">
-                <label for="toimituspvm_min" class="col-md-2 control-label">Toimitettu</label>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" id="toimituspvm_min" name="toimituspvm_min">
-                </div>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" id="toimituspvm_max" name="toimituspvm_max">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="laskutuspvm_min" class="col-md-2 control-label">Laskutettu</label>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" id="laskutuspvm_min" name="laskutuspvm_min">
-                </div>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" id="laskutuspvm_max" name="laskutuspvm_max">
+                <div class="col-md-offset-2 col-md-3">
+                    <div class="checkbox">
+                        <label><input type="checkbox" name="toimitettu" value=1> Rajaa toimitettuihin</label>
+                    </div>
                 </div>
             </div>
             <div class="form-group">
-                <label for="maksupvm_min" class="col-md-2 control-label">Maksettu</label>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" id="maksupvm_min" name="maksupvm_min">
+                <div class="col-md-offset-2 col-md-3">
+                    <div class="checkbox">
+                        <label><input type="checkbox" name="laskutettu" value=1> Rajaa laskutettuihin</label>
+                    </div>
                 </div>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" id="maksupvm_max" name="maksupvm_max">
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-3">
+                    <div class="checkbox">
+                        <label><input type="checkbox" name="maksettu" value=1> Rajaa maksettuihin</label>
+                    </div>
                 </div>
             </div>
             <div class="form-group">

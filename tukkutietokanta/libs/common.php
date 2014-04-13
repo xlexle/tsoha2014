@@ -2,17 +2,6 @@
 
 session_start();
 
-function getTietokantayhteys() {
-    static $yhteys = null;
-
-    if ($yhteys === null) {
-        $yhteys = new PDO('pgsql:');
-        $yhteys->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    }
-
-    return $yhteys;
-}
-
 function siirryKontrolleriin($kontrolleri, $data = array()) {
     $_SESSION['data'] = (object) $data;
     if (!strpos($kontrolleri, ".php")) {
@@ -75,6 +64,15 @@ function muunnahinnaksi($merkkijono) {
     if (!is_numeric($luku)) {
         return false;
     }
-    
+
     return round($luku, 2);
+}
+
+function formatoi($aikaleima) {
+    $aika = str_replace("-", ".", substr($aikaleima, 0, 19));
+    $yyyy = substr($aika, 0, 4);
+    $dd = substr($aika, 8, 2);
+    $aika = substr_replace($aika, $yyyy, 8, 2);
+    $aika = substr_replace($aika, $dd, 0, 4);
+    return $aika;
 }

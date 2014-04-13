@@ -1,41 +1,73 @@
 <?php
 
-require_once "libs/common.php";
 require_once "libs/models/ostos.php";
+require_once "libs/common.php";
 kirjautumisTarkistus();
 asiakasTarkistus();
 
-switch ($_GET['action']) {
-    case "add":
-        if (empty($_POST["tuote"])) {
-            siirryKontrolleriin("ostoskori", array(
-                'error' => "Tuotteen lisäys tilaukselle epäonnistui, koska tuotenumero tai -koodi puuttui."
-            ));
-        }
-        $tuote = $_POST["tuote"];
-        
+if (isset($_POST['tyhjenna'])) {
+    if ($_POST['tyhjenna'] == 1) {
+        unset($_SESSION['ostoskori']);
         siirryKontrolleriin("ostoskori", array(
-            'success' => "lisätään tilaukselle ostos..."
+            'success' => "Ostoskori on tyhjennetty."
         ));
+    }
+}
 
-    case "send":
-        if (empty($_POST["viite"])) {
-            siirryKontrolleriin("ostoskori", array(
-                'error' => "Tilaus vaatii ostoviitteen.",
-            ));
-        }
-        $viite = $_POST["viite"];
-        
+if (isset($_GET['lisaaostos'])) {
+    $tuotenro = $_GET['lisaaostos'];
+    $kpl = $_GET['kpl'];
+    if (!is_numeric($kpl))
+        $kpl = 1;
+
+    if (empty($tuotenro)) {
         siirryKontrolleriin("ostoskori", array(
-            'success' => "lähetetään tilaus.."
+            'error' => "Tuotteen lisäys ostoskoriin epäonnistui, koska tuotenumero puuttui."
         ));
-        
-    case "cancel":
-        
+    }
+
+    if (!empty($tuotenro) && !($tuotenro > 100000 && $tuotenro < 1000000)) {
         siirryKontrolleriin("ostoskori", array(
-            'success' => "perutaan tilaus..."
+            'tuotenro' => $tuotenro,
+            'error' => "Tuotteen lisäys ostoskoriin epäonnistui, koska tuotenumero ei ollut 6-numeroinen luku."
         ));
-        break;
+    }
+
+    $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
+
+    if (is_null($tuote)) {
+        siirryKontrolleriin("ostoskori", array(
+            'tuotenro' => $tuotenro,
+            'error' => "Tuotenumerolla ei löytynyt tuotetta."
+        ));
+    }
+
+    $riveja = 0;
+    $ostoskori = array();
+    if (isset($_SESSION['ostoskori'])) {
+        $riveja = count($_SESSION['ostoskori']);
+        $ostoskori = (array) $_SESSION['ostoskori'];
+    }
+
+    $ostos = luoUusiOstosOlio($tuote, $riveja, $kpl);
+    $ostoskori[] = $ostos;
+    $_SESSION['ostoskori'] = $ostoskori;
+
+    siirryKontrolleriin('ostoskori', array(
+        'success' => $kpl . ' kpl tuotetta ' . $tuotenro . ' lisätty ostoskoriin.'
+    ));
+}
+
+function luoUusiOstosOlio($tuote, $riveja, $kpl) {
+    $ostos = new Ostos();
+    $ostos->setTilausrivi($riveja + 1);
+    $ostos->setTuotenro($tuote->getTuotenro());
+    $ostos->setKoodi($tuote->getKoodi());
+    $ostos->setValmistaja($tuote->getValmistaja());
+    $ostos->setOstohinta($tuote->getHinta());
+    $ostos->setSaldo($tuote->getSaldo());
+    $ostos->setMaara($kpl);
+    return $ostos;
 }
 
 naytaNakyma("tilaus_new", 2, $_SESSION['data']);

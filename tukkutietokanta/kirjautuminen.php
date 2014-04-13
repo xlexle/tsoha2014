@@ -1,8 +1,8 @@
 <?php
 
-require_once "libs/common.php";
 require_once "libs/models/asiakas.php";
 require_once "libs/models/yllapitaja.php";
+require_once "libs/common.php";
 
 /* Tarkistetaan kirjautumistila */
 if (kirjautunut() && $_GET['kirjaudu'] != "ulos") {
@@ -17,24 +17,24 @@ switch ($_GET['kirjaudu']) {
         ));
 
     case "sisaan":
-        if (empty($_POST['username'])) {
+        if (empty($_POST['tunnus'])) {
             siirryKontrolleriin("kirjautuminen", array(
                 'error' => "Kirjautuminen epäonnistui, koska et antanut käyttäjätunnusta."
             ));
         }
-        $tunnus = $_POST['username'];
+        $tunnus = htmlspecialchars($_POST['tunnus'], ENT_QUOTES);
 
-        if (empty($_POST["password"])) {
+        if (empty($_POST['salasana'])) {
             siirryKontrolleriin("kirjautuminen", array(
                 'error' => "Kirjautuminen epäonnistui, koska et antanut salasanaa.",
                 'tunnus' => $tunnus
             ));
         }
-        $salasana = $_POST['password'];
+        $salasana = htmlspecialchars($_POST['salasana'], ENT_QUOTES);
 
         /* Tarkistetaan onko parametrina saatu yllapitajan tai asiakkaan tunnukset */
-        $asiakas = Asiakas::etsiAsiakasTunnuksilla($tunnus, $salasana);
-        $yllapitaja = Yllapitaja::etsiYllapitajaTunnuksilla($tunnus, $salasana);
+        $asiakas = Asiakas::etsiKirjautuja($tunnus, $salasana);
+        $yllapitaja = Yllapitaja::etsiKirjautuja($tunnus, $salasana);
 
         if (!is_null($asiakas)) {
             $_SESSION['kirjautunut'] = $asiakas->getTunnus();
@@ -53,9 +53,6 @@ switch ($_GET['kirjaudu']) {
                 'error' => "Kirjautuminen epäonnistui, koska annoit väärän tunnuksen tai salasanan."
             ));
         }
-
-    default:
-        break;
 }
 
 naytaNakyma("kirjautuminen", 0, $_SESSION['data']);

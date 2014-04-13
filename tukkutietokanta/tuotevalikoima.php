@@ -1,26 +1,27 @@
 <?php
 
-require_once "libs/common.php";
 require_once "libs/models/tuote.php";
+require_once "libs/common.php";
 kirjautumisTarkistus();
 
+/* listataan tuotteet lomakkeen tietojen perusteella */
 switch ($_GET['haku']) {
     case "listaa":
         $sivu = 1;
-        $naytetaan = 5;
+        $naytetaan = 10;
 
         if (isset($_GET['sivu'])) {
             $sivu = (int) $_GET['sivu'];
             if ($sivu < 1)
                 $sivu = 1;
         } else {
-            $valmistaja = $_POST['valmistaja'];
-            $hinta_min = $_POST['hinta_min'];
-            $hinta_max = $_POST['hinta_max'];
+            $valmistaja = htmlspecialchars($_POST['valmistaja'], ENT_QUOTES);
+            $hinta_min = htmlspecialchars($_POST['hinta_min'], ENT_QUOTES);
+            $hinta_max = htmlspecialchars($_POST['hinta_max'], ENT_QUOTES);
             $saldo_min = $_POST['saldo_min'];
             $poistettu = $_POST['poistettu'];
 
-            $ehdot = array(
+            $lomaketiedot = array(
                 'valmistaja' => $valmistaja,
                 'saldo_min' => $saldo_min,
                 'poistettu' => $poistettu
@@ -35,9 +36,9 @@ switch ($_GET['haku']) {
                 ));
             }
 
-            $ehdot['hinta_min'] = muunnahinnaksi($hinta_min);
-            $ehdot['hinta_max'] = muunnahinnaksi($hinta_max);
-            $_SESSION['ehdot'] = $ehdot;
+            $lomaketiedot['hinta_min'] = muunnahinnaksi($hinta_min);
+            $lomaketiedot['hinta_max'] = muunnahinnaksi($hinta_max);
+            $_SESSION['ehdot'] = $lomaketiedot;
         }
 
         if (!isset($_SESSION['ehdot'])) {
@@ -57,9 +58,9 @@ switch ($_GET['haku']) {
         naytaNakyma("tuotevalikoima", 1, array('success' => "listataan tuotteet joista avoimia tilauksia..."));
 }
 
-function listaaTuotteet($ehdot, $sivu, $naytetaan) {
-    $tuotelista = Tuote::haeTuotteet($ehdot['valmistaja'], $ehdot['hinta_min'], $ehdot['hinta_max'], $ehdot['saldo_min'], $ehdot['poistettu'], $sivu, $naytetaan);
-    $tuloksia = Tuote::laskeLukumaara($ehdot['valmistaja'], $ehdot['hinta_min'], $ehdot['hinta_max'], $ehdot['saldo_min'], $ehdot['poistettu']);
+function listaaTuotteet($lomaketiedot, $sivu, $naytetaan) {
+    $tuotelista = Tuote::haeTuotteet($lomaketiedot, $sivu, $naytetaan);
+    $tuloksia = Tuote::laskeLukumaara($lomaketiedot);
     $sivuja = ceil($tuloksia / $naytetaan);
     $rivi = $sivu * $naytetaan - ($naytetaan - 1);
 
@@ -76,16 +77,14 @@ function listaaTuotteet($ehdot, $sivu, $naytetaan) {
         'rivi' => $rivi
     );
 
-    if ($ehdot['poistettu'] == 1) {
-        $data['poistettu'] = true;
-    }
+    if ($lomaketiedot['poistettu'] == 1) $data['poistettu'] = true;
 
     naytaNakyma("tuote_list", 1, $data);
 }
 
 /* Siirrytään tuotteen katseluun */
 if (isset($_GET['tuotenro'])) {
-    $tuotenro = $_GET['tuotenro'];
+    $tuotenro = htmlspecialchars($_GET['tuotenro'], ENT_QUOTES);
 
     if (empty($tuotenro)) {
         siirryKontrolleriin("tuotevalikoima", array(
@@ -127,7 +126,7 @@ if (isset($_GET['tuotenro'])) {
 /* Siirrytään tuotteen muokkaustilaan */
 if (isset($_GET['muokkaa'])) {
     yllapitajaTarkistus();
-    $tuotenro = $_GET['muokkaa'];
+    $tuotenro = htmlspecialchars($_GET['muokkaa'], ENT_QUOTES);
     $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
     
     if (empty($tuotenro) || is_null($tuote)) {
@@ -146,7 +145,7 @@ if (isset($_GET['muokkaa'])) {
 /* Tallennetaan tuotteeseen tehdyt muutokset */
 if (isset($_GET['tallenna'])) {
     yllapitajaTarkistus();
-    $tuotenro = $_GET['tallenna'];
+    $tuotenro = htmlspecialchars($_GET['tallenna'], ENT_QUOTES);
     $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
     
     if (empty($tuotenro) || is_null($tuote)) {
@@ -155,14 +154,14 @@ if (isset($_GET['tallenna'])) {
         ));
     }
 
-    $koodi = $_POST['koodi'];
-    $kuvaus = $_POST['kuvaus'];
-    $valmistaja = $_POST['valmistaja'];
-    $hinta = $_POST['hinta'];
+    $koodi = htmlspecialchars($_POST['koodi'], ENT_QUOTES);
+    $kuvaus = htmlspecialchars($_POST['kuvaus'], ENT_QUOTES);
+    $valmistaja = htmlspecialchars($_POST['valmistaja'], ENT_QUOTES);
+    $hinta = htmlspecialchars($_POST['hinta'], ENT_QUOTES);
     $saldo = $_POST['saldo'];
     $tilauskynnys = $_POST['tilauskynnys'];
 
-    $data = array(
+    $lomaketiedot = array(
         'koodi' => $koodi,
         'kuvaus' => $kuvaus,
         'valmistaja' => $valmistaja,
@@ -171,7 +170,7 @@ if (isset($_GET['tallenna'])) {
         'tilauskynnys' => $tilauskynnys
     );
 
-    tarkistaTallennusLomake($data, 'muokkaa=' . $tuotenro);
+    tarkistaTallennusLomake($lomaketiedot, 'muokkaa=' . $tuotenro);
 
     $hinta = muunnahinnaksi($hinta);
 
@@ -191,7 +190,7 @@ if (isset($_GET['tallenna'])) {
 
 if (isset($_GET['poista'])) {
     yllapitajaTarkistus();
-    $tuotenro = $_GET['poista'];
+    $tuotenro = htmlspecialchars($_GET['poista'], ENT_QUOTES);
     $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
     
     if (empty($tuotenro) || is_null($tuote)) {
@@ -208,7 +207,35 @@ if (isset($_GET['poista'])) {
 
     if (Tuote::poistaValikoimasta($tuotenro)) {
         siirryKontrolleriin('tuotevalikoima.php?tuotenro=' . $tuotenro, array(
-            'success' => "Tuotteen poisto valikoimasta onnistui."
+            'success' => 'Tuotteen ' . $tuotenro . ' poisto valikoimasta onnistui.'
+        ));
+    }
+
+    siirryKontrolleriin("tuotevalikoima", array(
+        'error' => 'Virhe tietokantaoperaatiossa poistettaessa tuotetta ' . $tuotenro
+    ));
+}
+
+if (isset($_GET['palauta'])) {
+    yllapitajaTarkistus();
+    $tuotenro = htmlspecialchars($_GET['palauta'], ENT_QUOTES);
+    $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
+    
+    if (empty($tuotenro) || is_null($tuote)) {
+        siirryKontrolleriin("tuotevalikoima", array(
+            'error' => "Tuotetta ei löytynyt.",
+        ));
+    }
+
+    if (!Tuote::onPoistettu($tuotenro)) {
+        siirryKontrolleriin("tuotevalikoima", array(
+            'error' => 'Tuotetta ' . $tuotenro . ' ei voida palauttaa, koska sitä ei ole poistettu valikoimasta.'
+        ));
+    }
+
+    if (Tuote::palautaValikoimaan($tuotenro)) {
+        siirryKontrolleriin('tuotevalikoima.php?tuotenro=' . $tuotenro, array(
+            'success' => "Tuotteen palauttaminen valikoimaan onnistui."
         ));
     }
 
@@ -219,7 +246,7 @@ if (isset($_GET['poista'])) {
 
 if (isset($_GET['poistafinal'])) {
     yllapitajaTarkistus();
-    $tuotenro = $_GET['poistafinal'];
+    $tuotenro = htmlspecialchars($_GET['poistafinal'], ENT_QUOTES);
     $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
     
     if (empty($tuotenro) || is_null($tuote)) {
@@ -249,20 +276,19 @@ switch ($_GET['tuote']) {
     /* Siirrytään uuden tuotteen lomakkeeseen */
     case "uusi":
         yllapitajaTarkistus();
-        $data = (array) $_SESSION['data'];
-        naytaNakyma("tuote_new", 1, $data);
+        naytaNakyma("tuote_new", 1, $_SESSION['data']);
 
     /* Tarkistetaan lomaketiedot ja tallennetaan uusi tuote */
     case "perusta":
         yllapitajaTarkistus();
-        $koodi = $_POST['koodi'];
-        $kuvaus = $_POST['kuvaus'];
-        $valmistaja = $_POST['valmistaja'];
-        $hinta = $_POST['hinta'];
+        $koodi = htmlspecialchars($_POST['koodi'], ENT_QUOTES);
+        $kuvaus = htmlspecialchars($_POST['kuvaus'], ENT_QUOTES);
+        $valmistaja = htmlspecialchars($_POST['valmistaja'], ENT_QUOTES);
+        $hinta = htmlspecialchars($_POST['hinta'], ENT_QUOTES);
         $saldo = $_POST['saldo'];
         $tilauskynnys = $_POST['tilauskynnys'];
 
-        $data = array(
+        $lomaketiedot = array(
             'koodi' => $koodi,
             'kuvaus' => $kuvaus,
             'valmistaja' => $valmistaja,
@@ -271,7 +297,7 @@ switch ($_GET['tuote']) {
             'tilauskynnys' => $tilauskynnys
         );
 
-        tarkistaTallennusLomake($data, "tuote=uusi");
+        tarkistaTallennusLomake($lomaketiedot, "tuote=uusi");
 
         $hinta = muunnahinnaksi($hinta);
 
@@ -279,31 +305,31 @@ switch ($_GET['tuote']) {
         $uusiTuote = luoUusiTuoteOlio($koodi, $kuvaus, $valmistaja, $hinta, $saldo, $tilauskynnys);
         $tuotenro = $uusiTuote->lisaaKantaan();
 
-        siirryKontrolleriin("tuotevalikoima.php", array(
+        siirryKontrolleriin("tuotevalikoima", array(
             'success' => 'Tuote ' . $tuotenro . ' on perustettu onnistuneesti.'
         ));
 }
 
-function tarkistaTallennusLomake($data, $get) {
+function tarkistaTallennusLomake($data, $lomake) {
     if (empty($data['koodi'])) {
         $data['error'] = "Tallennus epäonnistui, koska valmistajan tuotekoodi puuttui.";
-        siirryKontrolleriin('tuotevalikoima.php?' . $get, $data);
+        siirryKontrolleriin('tuotevalikoima.php?' . $lomake, $data);
     }
 
     if (empty($data['valmistaja'])) {
         $data['error'] = "Tallennus epäonnistui, koska valmistaja puuttui.";
-        siirryKontrolleriin('tuotevalikoima.php?' . $get, $data);
+        siirryKontrolleriin('tuotevalikoima.php?' . $lomake, $data);
     }
 
     if (empty($data['hinta'])) {
         $data['error'] = "Tallennus epäonnistui, koska hinta puuttui.";
-        siirryKontrolleriin('tuotevalikoima.php?' . $get, $data);
+        siirryKontrolleriin('tuotevalikoima.php?' . $lomake, $data);
     }
 
     if (!muunnahinnaksi($data['hinta'])) {
         unset($data['hinta']);
         $data['error'] = "Tallennus epäonnistui, koska hinta ei ollut numero.";
-        siirryKontrolleriin('tuotevalikoima.php?' . $get, $data);
+        siirryKontrolleriin('tuotevalikoima.php?' . $lomake, $data);
     }
 }
 

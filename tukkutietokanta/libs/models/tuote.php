@@ -1,6 +1,6 @@
 <?php
 
-require_once "libs/common.php";
+require_once "libs/yhteys.php";
 
 class Tuote {
 
@@ -38,14 +38,14 @@ class Tuote {
         }
     }
 
-    public static function haeTuotteet($valmistaja, $hinta_min, $hinta_max, $saldo_min, $poistettu, $sivu, $tuloksia) {
+    public static function haeTuotteet($lomaketiedot, $sivu, $tuloksia) {
         $sql = "SELECT tuotenro, koodi, kuvaus, valmistaja, hinta, saldo, poistettu
             FROM tuote WHERE TRUE";
-        list($parametrit, $lisaasql) = self::maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min, $poistettu);
+        list($parametrit, $lisaasql) = self::maaritaParametrit((array) $lomaketiedot);
         $parametrit[] = $tuloksia;
         $parametrit[] = ($sivu - 1) * $tuloksia;
-
         $sql .= $lisaasql . " ORDER BY valmistaja, koodi LIMIT ? OFFSET ?";
+
         $kysely = getTietokantayhteys()->prepare($sql);
         $kysely->execute($parametrit);
 
@@ -58,9 +58,9 @@ class Tuote {
         return $tulokset;
     }
 
-    public static function laskeLukumaara($valmistaja, $hinta_min, $hinta_max, $saldo_min, $poistettu) {
+    public static function laskeLukumaara($lomaketiedot) {
         $sql = "SELECT count(*) FROM tuote WHERE TRUE";
-        list($parametrit, $lisaasql) = self::maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min, $poistettu);
+        list($parametrit, $lisaasql) = self::maaritaParametrit($lomaketiedot);
 
         $sql .= $lisaasql;
         $kysely = getTietokantayhteys()->prepare($sql);
@@ -71,11 +71,17 @@ class Tuote {
         return $kysely->fetchColumn();
     }
 
-    private function maaritaParametrit($valmistaja, $hinta_min, $hinta_max, $saldo_min, $poistettu) {
+    private function maaritaParametrit($lomaketiedot) {
         $params = array();
         $lisaasql = "";
 
-        if ($valmistaja != "") {
+        $valmistaja = $lomaketiedot['valmistaja'];
+        $hinta_min = $lomaketiedot['hinta_min'];
+        $hinta_max = $lomaketiedot['hinta_max'];
+        $saldo_min = $lomaketiedot['saldo_min'];
+        $poistettu = $lomaketiedot['poistettu'];
+
+        if (!empty($valmistaja)) {
             $lisaasql .= " AND valmistaja = ?";
             $params[] = $valmistaja;
         }
@@ -95,11 +101,8 @@ class Tuote {
             $params[] = floor($saldo_min);
         }
 
-        if ($poistettu == 1) {
-            $lisaasql .= " AND poistettu IS NOT NULL";
-        } else {
-            $lisaasql .= " AND poistettu IS NULL";
-        }
+        if ($poistettu == 1) $lisaasql .= " AND poistettu IS NOT NULL";
+        else $lisaasql .= " AND poistettu IS NULL";
 
         return array($params, $lisaasql);
     }
@@ -112,23 +115,31 @@ class Tuote {
         $tuote->setValmistaja($tulos->valmistaja);
         $tuote->setHinta($tulos->hinta);
         $tuote->setSaldo($tulos->saldo);
-        $tuote->setPoistettu((string) $tulos->poistettu);
+        $tuote->setPoistettu($tulos->poistettu);
         return $tuote;
     }
 
     public function lisaaKantaan() {
-        $sql = "INSERT INTO tuote (koodi, kuvaus, valmistaja, hinta, saldo, tilauskynnys)
-                            VALUES(?, ?, ?, ?, ?, ?) RETURNING tuotenro";
-        $kysely = getTietokantayhteys()->prepare($sql);
-
-        $ok = $kysely->execute(array(
+        $parametrit = array(
             $this->getKoodi(),
             $this->getKuvaus(),
             $this->getValmistaja(),
             $this->getHinta(),
-            $this->getSaldo(),
-            $this->getTilauskynnys()
-        ));
+            $this->getSaldo()
+        );
+
+        $arvo = "DEFAULT";
+        $tilauskynnys = $this->getTilauskynnys();
+        if ($tilauskynnys >= 0) {
+            $parametrit[] = $tilauskynnys;
+            $arvo .= "?";
+        }
+
+        $sql = "INSERT INTO tuote (koodi, kuvaus, valmistaja, hinta, saldo, tilauskynnys) 
+            VALUES(?, ?, ?, ?, ?, " . $arvo . ") RETURNING tuotenro";
+
+        $kysely = getTietokantayhteys()->prepare($sql);
+        $ok = $kysely->execute($parametrit);
         if ($ok) {
             $this->setTuotenro($kysely->fetchColumn());
         }
@@ -136,21 +147,27 @@ class Tuote {
     }
 
     public function paivitaKantaan() {
-        $sql = "UPDATE tuote SET koodi = ?, kuvaus = ?, valmistaja = ?, 
-            hinta = ?, saldo = ?, tilauskynnys = ?
-            WHERE tuotenro = ?";
-        $kysely = getTietokantayhteys()->prepare($sql);
-
-        $ok = $kysely->execute(array(
+        $parametrit = array(
             $this->getKoodi(),
             $this->getKuvaus(),
             $this->getValmistaja(),
             $this->getHinta(),
-            $this->getSaldo(),
-            $this->getTilauskynnys(),
-            $this->getTuotenro()
-        ));
+            $this->getSaldo()
+        );
 
+        $tilauskynnys = $this->getTilauskynnys();
+        $arvo = "DEFAULT";
+        if ($tilauskynnys >= 0) {
+            $parametrit[] = $tilauskynnys;
+            $arvo = "?";
+        }
+
+        $sql = "UPDATE tuote SET koodi = ?, kuvaus = ?, valmistaja = ?, 
+            hinta = ?, saldo = ?, tilauskynnys = " . $arvo . " WHERE tuotenro = ?";
+        $parametrit[] = $this->getTuotenro();
+
+        $kysely = getTietokantayhteys()->prepare($sql);
+        $ok = $kysely->execute($parametrit);
         return $ok;
     }
 
@@ -163,6 +180,12 @@ class Tuote {
 
     public static function poistaValikoimasta($tuotenro) {
         $sql = "UPDATE tuote SET poistettu = LOCALTIMESTAMP WHERE tuotenro = ?";
+        $kysely = getTietokantayhteys()->prepare($sql);
+        return $kysely->execute(array($tuotenro));
+    }
+
+    public static function palautaValikoimaan($tuotenro) {
+        $sql = "UPDATE tuote SET poistettu = DEFAULT WHERE tuotenro = ?";
         $kysely = getTietokantayhteys()->prepare($sql);
         return $kysely->execute(array($tuotenro));
     }
