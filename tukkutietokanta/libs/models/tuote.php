@@ -132,7 +132,7 @@ class Tuote {
         $tilauskynnys = $this->getTilauskynnys();
         if ($tilauskynnys >= 0) {
             $parametrit[] = $tilauskynnys;
-            $arvo .= "?";
+            $arvo = "?";
         }
 
         $sql = "INSERT INTO tuote (koodi, kuvaus, valmistaja, hinta, saldo, tilauskynnys) 
