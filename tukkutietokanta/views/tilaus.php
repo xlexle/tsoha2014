@@ -2,23 +2,26 @@
     <?php $tilaus = $data->tilaus?>
     <div class="row">
         <h2>Tilaus <?php echo $tilaus->getTilausnro();?></h2><br>
-        <form class="form-horizontal">
+        <form class="form-horizontal" action="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" method="POST">
             <div class="form-group">
-                <label class="col-md-2 control-label">Ostoviite</label>
+                <label for="ostoviite" class="col-md-2 control-label">Ostoviite</label>
                 <div class="col-md-4">
-                    <p class="form-control-static"><?php echo $tilaus->getOstoviite();?></p>
+                    <?php if ($data->muokkaa): { ?>
+                        <input type="text" maxlength="50" class="form-control" id="ostoviite" name="ostoviite" value="<?php echo $tilaus->getOstoviite();?>">
+                    <?php } else: { ?>
+                        <p class="form-control-static"><?php echo $tilaus->getOstoviite();?></p>
+                    <?php } endif; ?>
                 </div>
+                <?php if ($data->muokkaa): { ?>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> Tallenna viite</button>
+                    </div>
+                <?php } endif; ?>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label">Asiakasnumero</label>
-                <div class="col-md-1">
-                    <p class="form-control-static"><?php echo $tilaus->getAsiakasnro();?></p>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">Yritysnimi</label>
-                <div class="col-md-2">
-                    <p class="form-control-static"><?php echo $tilaus->getYritysnimi();?></p>
+                <label class="col-md-2 control-label">Asiakas</label>
+                <div class="col-md-4">
+                    <p class="form-control-static"><?php echo $tilaus->getAsiakasnro();?> / <?php echo $tilaus->getYritysnimi();?></p>
                 </div>
             </div>
             <div class="form-group">
@@ -55,7 +58,23 @@
     </div>
 
     <div class="row">
-        <hr><table class="table table-striped">
+        <hr>
+        <?php if ($data->muokkaa): { ?>
+            <form class="form-horizontal" action="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" method="POST">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-1">
+                        <input type="number" min="1" max="<?php count($data->ostokset);?>" class="form-control" id="rivi" name="rivi" placeholder="rivi">
+                    </div>
+                    <div class="col-md-1">
+                        <input type="number" min="0" max="999" class="form-control" id="kpl" name="kpl" placeholder="kpl">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> Muuta kappalemäärää</button>
+                    </div>
+                </div>
+            </form><br>
+        <?php } endif; ?>
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>&nbsp;</th>
@@ -64,23 +83,23 @@
                     <th>Valmistaja</th>
                     <th>EUR / kpl</th>
                     <th>Kappalemäärä</th>
-                    <th>Varastossa</th>
-<!--                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>-->
+                    <?php if (!$data->toimitettu): { ?>
+                        <th>Varastossa</th>
+                    <?php } endif; ?>
                 </tr>
             </thead>
             <tbody>
-                <?php $rivi = 0; foreach ($data->ostokset as $ostos):?>
+                <?php foreach ($data->ostokset as $ostos):?>
                     <tr>
-                        <td><?php echo++$rivi;?></td>
+                        <td><?php echo $ostos->getTilausrivi();?></td>
                         <td><?php echo $ostos->getTuotenro();?></td>
                         <td><?php echo $ostos->getKoodi();?></td>
                         <td><?php echo $ostos->getValmistaja();?></td>
                         <td><?php echo $ostos->getOstohinta();?></td>
                         <td><?php echo $ostos->getMaara();?></td>
-                        <td><?php echo $ostos->getSaldo();?></td>
-<!--                        <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-wrench"></span> Muuta kappalemäärää</a></td>
-                        <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-remove"></span> Poista</a></td>-->
+                        <?php if (!$data->toimitettu): { ?>
+                            <td><?php echo $ostos->getSaldo();?></td>
+                        <?php } endif; ?>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -91,21 +110,43 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">Summa</label>
                     <div class="col-md-4">
-                        <p class="form-control-static"><?php echo $tilaus->getKokonaisarvo();?> EUR (0% alv)</p>
+                        <p class="form-control-static"><?php echo $tilaus->getKokonaisarvo();?> EUR</p>
                     </div>
                 </div>
             </form>
         </div>
-        <hr>
     </div>
-
+    <hr>
+    
+    
+    
     <div class="row">
-        <form class="form-horizontal" action="tilausseuranta.php?haku=uusi" method="POST">
-            <div class="form-group">
-                <div class="col-md-offset-2 col-md-4">
-                    <button type="submit" class="btn btn-default">Uusi haku</button>
+        <?php if (!$data->muokkaa && !$data->toimitettu && onYllapitaja()): { ?>
+            <form class="form-horizontal" action="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" method="POST">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-4">
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-wrench"></span> Muokkaa</button>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        <?php } endif; ?>
+        <?php if (!$data->muokkaa): { ?>
+            <form class="form-horizontal" action="tilausseuranta.php?haku=uusi" method="POST">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-4">
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-repeat"></span> Uusi haku</button>
+                    </div>
+                </div>
+            </form>
+        <?php } else: { ?>
+            <form class="form-horizontal" action="tilausseuranta.php?tilausnro=<?php echo $tilaus->getTilausnro();?>" method="POST">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-4">
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-check"></span> Lopeta muokkaus</button>
+                    </div>
+                </div>
+            </form>
+        <?php } endif; ?>
+        <br>
     </div>
 </div>

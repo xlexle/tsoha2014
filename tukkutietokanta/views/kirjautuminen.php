@@ -14,7 +14,7 @@
         </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-3">
-                <button type="submit" class="btn btn-default">Kirjaudu sisään</button>
+                <button type="submit" class="btn btn-default">Kirjaudu sisään <span class="glyphicon glyphicon-log-in"></span></button>
             </div>
         </div>
     </form>

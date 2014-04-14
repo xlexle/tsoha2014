@@ -24,6 +24,7 @@
             </div>
         </div>
     <?php } endif; ?>
+    <hr>
 
     <div class="row">
         <table class="table table-striped">
@@ -34,7 +35,7 @@
                     <th>Yritysnimi</th>
                     <th>Email</th>
                     <th>Puhelinnumero</th>
-                    <th>Luottoraja EUR</th>
+                    <th>Luottoraja (EUR)</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
@@ -42,7 +43,7 @@
                 </tr>
             </thead>
             <tbody>
-                <?php $rivi = $data->rivi;
+            <?php $rivi = $data->rivi;
                 foreach ($data->asiakkaat as $asiakas):?>
                 <tr>
                     <td><?php echo $rivi++;?></td>
@@ -51,29 +52,17 @@
                     <td><?php echo $asiakas->getEmail();?></td>
                     <td><?php echo $asiakas->getPuhelinnumero();?></td>
                     <td><?php echo $asiakas->getLuottoraja();?></td>
-                    <td><a href="asiakashallinta.php?asiakasnro=<?php echo $asiakas->getTunnus();?>"
-                        class="btn btn-xs btn-default" target="_blank"><span class="glyphicon glyphicon-eye-open"></span>
-                        </a>
-                    </td>
-                    <td><a href="asiakashallinta.php?muokkaa=<?php echo $asiakas->getTunnus();?>" 
-                        class="btn btn-xs btn-default" target="_blank"><span class="glyphicon glyphicon-wrench"></span>
-                        </a>
-                    </td>
-                    <td><a href="#" class="btn btn-xs btn-default"><span 
-                        class="glyphicon glyphicon-th-list" target="_blank"></span> Avoimet tilaukset
-                        </a>
-                    </td>
-                    <td><a href="#" class="btn btn-xs btn-default"><span 
-                        class="glyphicon glyphicon-th-list" target="_blank"></span> Kaikki tilaukset
-                        </a>
-                    </td>
+                    <td><a href="asiakashallinta.php?asiakasnro=<?php echo $asiakas->getTunnus();?>" target="_blank" title="Avaa asiakastiedot"><span class="glyphicon glyphicon-eye-open"></span></a></td>
+                    <td><a href="asiakashallinta.php?muokkaa=<?php echo $asiakas->getTunnus();?>" target="_blank" title="Muokkaa asiakastietoja"><span class="glyphicon glyphicon-wrench"></span></a></td>
+                    <td><a href="#"><span class="glyphicon glyphicon-th-list" target="_blank" title="Listaa avoimet tilaukset"></span></a></td>
                 </tr>
-                <?php endforeach; ?>
+            <?php endforeach; ?>
             </tbody>
         </table>
     </div>
+    <hr>
 
     <div class="row">
-        <p><a class = "btn btn-default" href = "asiakashallinta.php">Uusi haku</a></p>
+        <p><a class="btn btn-default col-md-offset-2" href="asiakashallinta.php"><span class="glyphicon glyphicon-repeat"></span> Uusi haku</a></p>
     </div>
 </div>

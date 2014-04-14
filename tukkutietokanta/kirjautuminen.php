@@ -10,12 +10,14 @@ if (kirjautunut() && $_GET['kirjaudu'] != "ulos") {
 }
 
 switch ($_GET['kirjaudu']) {
+    /* kirjaudutaan ulos */
     case "ulos":
         session_unset();
         siirryKontrolleriin("kirjautuminen", array(
             'success' => "Olet kirjautunut ulos."
         ));
 
+    /* kirjaudutaan sisään */
     case "sisaan":
         if (empty($_POST['tunnus'])) {
             siirryKontrolleriin("kirjautuminen", array(

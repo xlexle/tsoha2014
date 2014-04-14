@@ -54,11 +54,14 @@
             </div>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-4">
-                    <button type="submit" class="btn btn-default">Hae tilauksia</button>
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-th-list"></span> Hae tilauksia</button>
                 </div>
             </div>
         </form>
+    </div>
+    <hr>
 
+    <div class="row">
         <br>
         <form class="form-horizontal" action="tilausseuranta.php" method="GET">
             <div class="form-group">
@@ -69,7 +72,7 @@
             </div>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-4">
-                    <button type="submit" class="btn btn-default">Hae tilaus</button>
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span> Hae tilaus</button>
                 </div>
             </div>
         </form>  

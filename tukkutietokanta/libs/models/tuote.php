@@ -20,6 +20,7 @@ class Tuote {
 
     /* Tietokantafunktiot */
 
+    /* etsii yksittäisen tuotteen kannasta */
     public static function etsiTuoteTuotenumerolla($tuotenro) {
         if (!is_numeric($tuotenro) || !(floor($tuotenro) == $tuotenro))
             return null;
@@ -38,6 +39,7 @@ class Tuote {
         }
     }
 
+    /* hakee tuotteet jotka vastaavat hakuehtoja, käyttää sivutustoimintoa */
     public static function haeTuotteet($lomaketiedot, $sivu, $tuloksia) {
         $sql = "SELECT tuotenro, koodi, kuvaus, valmistaja, hinta, saldo, poistettu
             FROM tuote WHERE TRUE";
@@ -58,6 +60,7 @@ class Tuote {
         return $tulokset;
     }
 
+    /* laskee niiden tuotteiden lukumäärän, jotka vastaavat hakuehtoja */
     public static function laskeLukumaara($lomaketiedot) {
         $sql = "SELECT count(*) FROM tuote WHERE TRUE";
         list($parametrit, $lisaasql) = self::maaritaParametrit($lomaketiedot);
@@ -71,6 +74,7 @@ class Tuote {
         return $kysely->fetchColumn();
     }
 
+    /* määrittää sql-kyselyssä käytettävät parametrit hakuehtojen perusteella */
     private function maaritaParametrit($lomaketiedot) {
         $params = array();
         $lisaasql = "";
@@ -119,6 +123,7 @@ class Tuote {
         return $tuote;
     }
 
+    /* lisää yksittäisen tuote-olion kantaan */
     public function lisaaKantaan() {
         $parametrit = array(
             $this->getKoodi(),
@@ -146,6 +151,7 @@ class Tuote {
         return $this->tuotenro;
     }
 
+    /* päivittää yksittäisen tuote-olion kantaan */
     public function paivitaKantaan() {
         $parametrit = array(
             $this->getKoodi(),
@@ -171,6 +177,7 @@ class Tuote {
         return $ok;
     }
 
+    /* tarkistaa, onko tuote poistettu valikoimasta */
     public static function onPoistettu($tuotenro) {
         $sql = "SELECT * FROM tuote WHERE tuotenro = ? AND poistettu IS NOT NULL LIMIT 1";
         $kysely = getTietokantayhteys()->prepare($sql);
@@ -178,18 +185,21 @@ class Tuote {
         return $kysely->fetchColumn();
     }
 
+    /* poistaa tuotteen valikoimasta */
     public static function poistaValikoimasta($tuotenro) {
         $sql = "UPDATE tuote SET poistettu = LOCALTIMESTAMP WHERE tuotenro = ?";
         $kysely = getTietokantayhteys()->prepare($sql);
         return $kysely->execute(array($tuotenro));
     }
 
+    /* palauttaa tuotteen valikoimaan */
     public static function palautaValikoimaan($tuotenro) {
         $sql = "UPDATE tuote SET poistettu = DEFAULT WHERE tuotenro = ?";
         $kysely = getTietokantayhteys()->prepare($sql);
         return $kysely->execute(array($tuotenro));
     }
 
+    /* poistaa tuotteen lopullisesti kannasta */
     public static function poistaLopullisesti($tuotenro) {
         $sql = "DELETE FROM tuote WHERE tuotenro = ?";
         $kysely = getTietokantayhteys()->prepare($sql);

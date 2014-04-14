@@ -46,14 +46,18 @@
             </div>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-4">
-                    <button type="submit" class="btn btn-default">Perusta asiakas</button>
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Perusta asiakas</button>
                 </div>
             </div>  
         </form>
+    </div>
+    <hr>
+    
+    <div class="row">
         <form class="form-horizontal" action="asiakashallinta.php">
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-4">
-                    <button type="submit" class="btn btn-default">Takaisin</button>
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span> Takaisin</button>
                 </div>
             </div>
         </form>

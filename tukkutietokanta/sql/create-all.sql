@@ -46,7 +46,6 @@ create table ostos(
 	tilausrivi integer NOT NULL,
 	ostohinta dec(9,2) NOT NULL,
 	maara integer NOT NULL,
-	peruttu timestamp,
 	CONSTRAINT pk_ostos 
-		PRIMARY KEY (tilausnro, tuotenro, tilausrivi)
+		PRIMARY KEY (tilausnro, tilausrivi)
 );

@@ -28,6 +28,7 @@ class Yllapitaja {
         $this->salasana = $salasana;
     }
 
+    /* hakee ylläpitäjän kannasta tunnuksen ja salasanan perusteella */
     public static function etsiKirjautuja($tunnus, $salasana) {
         $sql = "SELECT tunnus, salasana FROM yllapitaja WHERE tunnus = ? AND salasana = ? LIMIT 1";
         $kysely = getTietokantayhteys()->prepare($sql);
@@ -44,6 +45,7 @@ class Yllapitaja {
         }
     }
 
+    /* hakee kaikki ylläpitäjät kirjautumistietojen listausta varten */
     public static function haeKaikkiYllapitajat() {
         $sql = "SELECT tunnus, salasana FROM yllapitaja ORDER BY tunnus";
         $kysely = getTietokantayhteys()->prepare($sql);

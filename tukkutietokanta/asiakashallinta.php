@@ -40,7 +40,7 @@ function listaaAsiakkaat($sivu, $naytetaan) {
     naytaNakyma("asiakas_list", 4, $data);
 }
 
-/* Siirrytään asiakkaan katseluun */
+/* Siirrytään asiakastietojen katseluun */
 if (isset($_GET['asiakasnro'])) {
     $asiakasnro = htmlspecialchars($_GET['asiakasnro'], ENT_QUOTES);
 
@@ -133,6 +133,7 @@ if (isset($_GET['tallenna'])) {
     ));
 }
 
+/* poistetaan asiakas tietokannasta */
 if (isset($_GET['poista'])) {
     $asiakasnro = htmlspecialchars($_GET['poista'], ENT_QUOTES);
     $asiakas = Asiakas::etsiAsiakasAsiakasnumerolla($asiakasnro);
@@ -155,11 +156,11 @@ if (isset($_GET['poista'])) {
 }
 
 switch ($_GET['asiakas']) {
-    /* Siirrytään uuden tuotteen lomakkeeseen */
+    /* Siirrytään uuden asiakkaan lomakkeeseen */
     case "uusi":
         naytaNakyma("asiakas_new", 4, $_SESSION['data']);
 
-    /* Tarkistetaan lomaketiedot ja tallennetaan uusi tuote */
+    /* Perustetaan uusi asiakas */
     case "perusta":
         $yritysnimi = htmlspecialchars($_POST['yritysnimi'], ENT_QUOTES);
         $osoite = htmlspecialchars($_POST['osoite'], ENT_QUOTES);
@@ -190,6 +191,7 @@ switch ($_GET['asiakas']) {
         ));
 }
 
+/* tarkistetaan asiakkaan tallennuslomakkeen tiedot ja suoritetaan ohjaukset */
 function tarkistaTallennusLomake($data, $lomake) {
     if (empty($data['yritysnimi'])) {
         $data['error'] = "Tallennus epäonnistui, koska yrityksen nimi puuttui.";

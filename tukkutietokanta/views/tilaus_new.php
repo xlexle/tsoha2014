@@ -1,11 +1,11 @@
 <div class="container">
     <div class="row">
-        <h2>Uusi tilaus</h2><br>
-        <form class="form-horizontal" action="ostoskori.php?toiminto=lisaaostos" method="GET">
+        <h2>Ostoskori</h2><br>
+        <form class="form-horizontal" action="ostoskori.php" method="GET">
             <div class="form-group">
-                <label for="lisaaostos" class="col-md-2 control-label">Tuote</label>
-                <div class="col-md-3">
-                    <input type="text" maxlength="25" class="form-control" id="lisaaostos" name="lisaaostos" value="<?php echo $data->tuotenro;?>" placeholder="tuotenumero">
+                <label for="lisaaostos" class="col-md-2 control-label">Tuotenumero</label>
+                <div class="col-md-2">
+                    <input type="text" maxlength="6" class="form-control" id="lisaaostos" name="lisaaostos" value="<?php echo $data->tuotenro;?>" placeholder="6 numeroa">
                 </div>
                 <div class="col-md-1">
                     <input type="number" min="1" class="form-control" id="kpl" name="kpl" placeholder="1 kpl">
@@ -13,17 +13,30 @@
             </div>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-4">
-                    <button type="submit" class="btn btn-default">Lisää tilaukselle</button>
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Lisää tilaukselle</button>
                 </div>
             </div>
         </form>
         <br>
     </div>
 
-    <?php $ostoskori = (array) $_SESSION['ostoskori'];
-    if (!empty($ostoskori)): ?>
+    <?php $ostoskori = (array) $_SESSION['ostoskori']; if (!empty($ostoskori)): ?>
     <div class="row">
-        <hr><table class="table table-striped">
+        <hr>
+        <form class="form-horizontal" action="ostoskori.php" method="POST">
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-1">
+                    <input type="number" min="1" class="form-control" id="rivi" name="rivi" placeholder="rivi">
+                </div>
+                <div class="col-md-1">
+                    <input type="number" min="0" max="999" class="form-control" id="kpl" name="kpl" placeholder="kpl">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> Muuta kappalemäärää</button>
+                </div>
+            </div>
+        </form><br>
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>&nbsp;</th>
@@ -33,13 +46,10 @@
                     <th>EUR / kpl</th>
                     <th>Kappalemäärä</th>
                     <th>Varastossa</th>
-<!--                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>-->
                 </tr>
             </thead>
             <tbody>
-                <?php $rivi = 0; $summa = 0;
-                foreach ($ostoskori as $ostos):?>
+            <?php $summa = 0; foreach ($ostoskori as $ostos):?>
                     <tr>
                         <td><?php echo $ostos->getTilausrivi();?></td>
                         <td><?php echo $ostos->getTuotenro();?></td>
@@ -48,10 +58,8 @@
                         <td><?php echo $ostos->getOstohinta();?></td>
                         <td><?php echo $ostos->getMaara();?></td>
                         <td><?php echo $ostos->getSaldo();?></td>
-<!--                        <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-wrench"></span> Muuta kappalemäärää</a></td>
-                        <td><a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-remove"></span> Poista</a></td>-->
                     </tr>
-                <?php $summa += $ostos->getMaara() * $ostos->getOstohinta(); endforeach; ?>
+            <?php $summa += $ostos->getMaara() * $ostos->getOstohinta(); endforeach; ?>
             </tbody>
         </table>
         
@@ -60,13 +68,13 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">Summa</label>
                     <div class="col-md-4">
-                        <p class="form-control-static"><?php echo $summa;?> EUR (0% alv)</p>
+                        <p class="form-control-static"><?php echo $summa;?> EUR</p>
                     </div>
                 </div>
             </form>
         </div>
-        <hr>
     </div>
+    <hr>
 
     <div class="row">
         <form class="form-horizontal" action="tilausseuranta.php?ostoskori=laheta" method="POST">
@@ -78,7 +86,7 @@
             </div>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-4">
-                    <button type="submit" class="btn btn-default">Lähetä tilaus</button>
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-ok-circle"></span> Lähetä tilaus</button>
                 </div>
             </div>
         </form>
@@ -89,7 +97,7 @@
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-4">
                     <input type="hidden" name="tyhjenna" value=1>
-                    <button type="submit" class="btn btn-default">Tyhjennä ostoskori</button>
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> Tyhjennä ostoskori</button>
                 </div>
             </div>
         </form>

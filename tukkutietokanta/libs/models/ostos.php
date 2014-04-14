@@ -4,16 +4,18 @@ require_once "libs/yhteys.php";
 require_once "libs/models/tuote.php";
 
 class Ostos extends Tuote {
-    
+
     private $tilausrivi;
     private $ostohinta;
     private $maara;
     private $peruttu;
-    
-    /* Tietokantafunktiot */
-    
+
+    /* tietokantafunktiot */
+
+    /* hakee kaikki ostokset jotka liittyvät tiettyyn tilaukseen */
+
     public static function haeOstokset($tilausnro) {
-        $sql = "SELECT ostos.tuotenro, koodi, valmistaja, saldo, tilausrivi, ostohinta, maara, peruttu
+        $sql = "SELECT ostos.tuotenro, koodi, valmistaja, saldo, tilausrivi, ostohinta, maara
             FROM ostos, tuote WHERE ostos.tilausnro = ? AND ostos.tuotenro = tuote.tuotenro
             ORDER BY tilausrivi";
 
@@ -28,7 +30,7 @@ class Ostos extends Tuote {
 
         return $tulokset;
     }
-    
+
     private function haettuOstos($tulos) {
         $ostos = new Ostos();
         $ostos->setTuotenro($tulos->tuotenro);
@@ -41,7 +43,9 @@ class Ostos extends Tuote {
         $ostos->setPeruttu(formatoi($tulos->peruttu));
         return $ostos;
     }
-    
+
+    /* lisää yksittäisen ostos-olion kantaan tietyllä tilausnumerolla */
+
     public function lisaaKantaan($tilausnro) {
         $parametrit = array(
             $tilausnro,
@@ -57,9 +61,15 @@ class Ostos extends Tuote {
         $kysely = getTietokantayhteys()->prepare($sql);
         $kysely->execute($parametrit);
     }
-    
-    /* Getterit ja setterit */
-    
+
+    public static function asetaMaara($tilausnro, $tilausrivi, $maara) {
+        $sql = "UPDATE ostos SET maara = ? WHERE tilausnro = ? AND tilausrivi = ?";
+        $kysely = getTietokantayhteys()->prepare($sql);
+        $kysely->execute(array($maara, $tilausnro, $tilausrivi));
+    }
+
+    /* getterit ja setterit */
+
     public function getTilausrivi() {
         return $this->tilausrivi;
     }
@@ -67,7 +77,7 @@ class Ostos extends Tuote {
     public function setTilausrivi($tilausrivi) {
         $this->tilausrivi = $tilausrivi;
     }
-    
+
     public function getOstohinta() {
         return $this->ostohinta;
     }

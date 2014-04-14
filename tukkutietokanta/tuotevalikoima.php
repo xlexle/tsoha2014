@@ -127,8 +127,13 @@ if (isset($_GET['tuotenro'])) {
 if (isset($_GET['muokkaa'])) {
     yllapitajaTarkistus();
     $tuotenro = htmlspecialchars($_GET['muokkaa'], ENT_QUOTES);
-    $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
+    if (Tuote::onPoistettu($tuotenro)) {
+        siirryKontrolleriin("tuotevalikoima", array(
+            'error' => 'Muokkaus ei onnistunut, koska tuote ' . $tuotenro . ' on poistettu valikoimasta.',
+        ));
+    }
     
+    $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
     if (empty($tuotenro) || is_null($tuote)) {
         siirryKontrolleriin("tuotevalikoima", array(
             'error' => "Tuotetta ei löytynyt.",
@@ -146,8 +151,13 @@ if (isset($_GET['muokkaa'])) {
 if (isset($_GET['tallenna'])) {
     yllapitajaTarkistus();
     $tuotenro = htmlspecialchars($_GET['tallenna'], ENT_QUOTES);
-    $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
+    if (Tuote::onPoistettu($tuotenro)) {
+        siirryKontrolleriin("tuotevalikoima", array(
+            'error' => 'Tallennus ei onnistunut, koska tuote ' . $tuotenro . ' on poistettu valikoimasta.',
+        ));
+    }
     
+    $tuote = Tuote::etsiTuoteTuotenumerolla($tuotenro);
     if (empty($tuotenro) || is_null($tuote)) {
         siirryKontrolleriin("tuotevalikoima", array(
             'error' => "Tuotetta ei löytynyt.",
@@ -178,9 +188,7 @@ if (isset($_GET['tallenna'])) {
     $paivitettavaTuote = luoUusiTuoteOlio($koodi, $kuvaus, $valmistaja, $hinta, $saldo, $tilauskynnys);
     $paivitettavaTuote->setTuotenro($tuotenro);
     if ($paivitettavaTuote->paivitaKantaan()) {
-        siirryKontrolleriin("tuotevalikoima.php", array(
-            'success' => 'Tuote ' . $tuotenro . ' on päivitetty onnistuneesti.'
-        ));
+        siirryKontrolleriin('tuotevalikoima.php?tuotenro=' . $tuotenro);
     }
 
     siirryKontrolleriin("tuotevalikoima", array(
@@ -188,6 +196,7 @@ if (isset($_GET['tallenna'])) {
     ));
 }
 
+/* poistetaan tuote valikoimasta */
 if (isset($_GET['poista'])) {
     yllapitajaTarkistus();
     $tuotenro = htmlspecialchars($_GET['poista'], ENT_QUOTES);
@@ -206,9 +215,7 @@ if (isset($_GET['poista'])) {
     }
 
     if (Tuote::poistaValikoimasta($tuotenro)) {
-        siirryKontrolleriin('tuotevalikoima.php?tuotenro=' . $tuotenro, array(
-            'success' => 'Tuotteen ' . $tuotenro . ' poisto valikoimasta onnistui.'
-        ));
+        siirryKontrolleriin('tuotevalikoima.php?tuotenro=' . $tuotenro);
     }
 
     siirryKontrolleriin("tuotevalikoima", array(
@@ -216,6 +223,7 @@ if (isset($_GET['poista'])) {
     ));
 }
 
+/* palautetaan tuote valikoimaan */
 if (isset($_GET['palauta'])) {
     yllapitajaTarkistus();
     $tuotenro = htmlspecialchars($_GET['palauta'], ENT_QUOTES);
@@ -234,9 +242,7 @@ if (isset($_GET['palauta'])) {
     }
 
     if (Tuote::palautaValikoimaan($tuotenro)) {
-        siirryKontrolleriin('tuotevalikoima.php?tuotenro=' . $tuotenro, array(
-            'success' => "Tuotteen palauttaminen valikoimaan onnistui."
-        ));
+        siirryKontrolleriin('tuotevalikoima.php?tuotenro=' . $tuotenro);
     }
 
     siirryKontrolleriin("tuotevalikoima", array(
@@ -244,6 +250,7 @@ if (isset($_GET['palauta'])) {
     ));
 }
 
+/* poistetaan tuote tietokannasta */
 if (isset($_GET['poistafinal'])) {
     yllapitajaTarkistus();
     $tuotenro = htmlspecialchars($_GET['poistafinal'], ENT_QUOTES);
@@ -278,7 +285,7 @@ switch ($_GET['tuote']) {
         yllapitajaTarkistus();
         naytaNakyma("tuote_new", 1, $_SESSION['data']);
 
-    /* Tarkistetaan lomaketiedot ja tallennetaan uusi tuote */
+    /* tallennetaan uusi tuote */
     case "perusta":
         yllapitajaTarkistus();
         $koodi = htmlspecialchars($_POST['koodi'], ENT_QUOTES);
@@ -310,6 +317,7 @@ switch ($_GET['tuote']) {
         ));
 }
 
+/* tarkistetaan tuotteen tallennuslomakkeen tiedot ja suoritetaan ohjaukset */
 function tarkistaTallennusLomake($data, $lomake) {
     if (empty($data['koodi'])) {
         $data['error'] = "Tallennus epäonnistui, koska valmistajan tuotekoodi puuttui.";

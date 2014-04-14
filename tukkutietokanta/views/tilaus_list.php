@@ -24,6 +24,7 @@
             </div>
         </div>
     <?php } endif; ?>
+    <hr>
 
     <div class="row">
         <table class="table table-striped">
@@ -40,8 +41,8 @@
                 </tr>
             </thead>
             <tbody>
-                <?php $rivi = $data->rivi;
-                foreach ($data->tilaukset as $tilaus):?>
+            <?php $rivi = $data->rivi;
+            foreach ($data->tilaukset as $tilaus): {;?>
                 <tr>
                     <td><?php echo $rivi++;?></td>
                     <td><?php echo $tilaus->getTilausnro();?></td>
@@ -49,23 +50,18 @@
                     <td><?php echo $tilaus->getAsiakasnro();?></td>
                     <td><?php echo $tilaus->getKokonaisarvo();?></td>
                     <td><?php echo formatoi($tilaus->getSaapumisaika());?></td>
-                    <td><a href="tilausseuranta.php?tilausnro=<?php echo $tilaus->getTilausnro();?>"
-                        class="btn btn-xs btn-default" target="_blank"><span class="glyphicon glyphicon-eye-open"></span>
-                        </a>
-                    </td>
+                    <td><a href="tilausseuranta.php?tilausnro=<?php echo $tilaus->getTilausnro();?>" target="_blank" title="Avaa tilaus"><span class="glyphicon glyphicon-eye-open"></span></a></td>
                     <?php if (onYllapitaja()): { ?>
-                        <td><a href="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" 
-                            class="btn btn-xs btn-default" target="_blank"><span class="glyphicon glyphicon-wrench"></span>
-                            </a>
-                        </td>
+                        <td><a href="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" target="_blank" title="Muokkaa tilausta"><span class="glyphicon glyphicon-wrench"></span></a></td>
                     <?php } endif; ?>
                 </tr>
-                <?php endforeach; ?>
+            <?php } endforeach; ?>
             </tbody>
         </table>
     </div>
+    <hr>
 
     <div class="row">
-        <p><a class = "btn btn-default" href = "tilausseuranta.php?haku=uusi">Uusi haku</a></p>
+        <p><a class = "btn btn-default col-md-offset-2" href="tilausseuranta.php?haku=uusi"><span class="glyphicon glyphicon-repeat"></span> Uusi haku</a></p>
     </div>
 </div>

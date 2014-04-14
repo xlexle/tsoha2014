@@ -18,6 +18,7 @@ class Tilaus {
     
     /* Tietokantafunktiot */
     
+    /* hakee yksittäisen tilauksen kannasta */
     public static function etsiTilausTilausnumerolla($tilausnro) {
         if (!is_numeric($tilausnro) || !(floor($tilausnro) == $tilausnro)) return null;
         $sql = "SELECT tilausnro, ostoviite, kokonaisarvo, saapumisaika, toimitettu, laskutettu, maksettu, asiakasnro
@@ -37,6 +38,7 @@ class Tilaus {
         }
     }
     
+    /* hakee kaikki tilaukset jotka vastaavat hakuehtoja, käyttää sivutustoimintoa */
     public static function haeTilaukset($lomaketiedot, $sivu, $tuloksia) {
         $sql = "SELECT tilausnro, ostoviite, kokonaisarvo, saapumisaika, asiakasnro 
             FROM tilaus WHERE TRUE";
@@ -57,6 +59,7 @@ class Tilaus {
         return $tulokset;
     }
     
+    /* laskee niiden tilausten lukumäärän, jotka vastaavat hakuehtoja */
     public static function laskeLukumaara($lomaketiedot) {
         $sql = "SELECT count(*) FROM tilaus WHERE TRUE";
         list($parametrit, $lisaasql) = self::maaritaParametrit($lomaketiedot);
@@ -70,6 +73,7 @@ class Tilaus {
         return $kysely->fetchColumn();
     }
     
+    /* määrittää sql-kyselyssä käytettävät parametrit hakuehtojen perusteella */
     private function maaritaParametrit($lomaketiedot) {
         $params = array();
         $lisaasql = "";
@@ -113,6 +117,7 @@ class Tilaus {
         return $tilaus;
     }
     
+    /* lisää yksittäisen tilaus-olion kantaan */
     public function lisaaKantaan() {
         $parametrit = array(
             $this->getOstoviite(),
@@ -132,6 +137,7 @@ class Tilaus {
         return $this->tilausnro;
     }
     
+    /* päivittää yksittäisen tilaus-olion kantaan */
     public function paivitaKantaan() {
         $parametrit = array(
             $this->getOstoviite(),
@@ -148,22 +154,32 @@ class Tilaus {
         return $ok;
     }
     
+    /* asettaa tilauksen toimitetuksi */
     public static function asetaToimitetuksi($tilausnro) {
-        $sql = "UPDATE tuote SET toimitettu = LOCALTIMESTAMP WHERE tilausnro = ?";
+        $sql = "UPDATE tilaus SET toimitettu = LOCALTIMESTAMP WHERE tilausnro = ?";
         $kysely = getTietokantayhteys()->prepare($sql);
         return $kysely->execute(array($tilausnro));
     }
     
+    /* asettaa tilauksen laskutetuksi */
     public static function asetaLaskutetuksi($tilausnro) {
-        $sql = "UPDATE tuote SET laskutettu = LOCALTIMESTAMP WHERE tilausnro = ?";
+        $sql = "UPDATE tilaus SET laskutettu = LOCALTIMESTAMP WHERE tilausnro = ?";
         $kysely = getTietokantayhteys()->prepare($sql);
         return $kysely->execute(array($tilausnro));
     }
     
+    /* asettaa tilauksen maksetuksi */
     public static function asetaMaksetuksi($tilausnro) {
-        $sql = "UPDATE tuote SET maksettu = LOCALTIMESTAMP WHERE tilausnro = ?";
+        $sql = "UPDATE tilaus SET maksettu = LOCALTIMESTAMP WHERE tilausnro = ?";
         $kysely = getTietokantayhteys()->prepare($sql);
         return $kysely->execute(array($tilausnro));
+    }
+    
+    /* muuttaa tilauksen ostoviitteen */
+    public static function asetaViite($tilausnro, $ostoviite) {
+        $sql = "UPDATE tilaus SET ostoviite = ? WHERE tilausnro = ?";
+        $kysely = getTietokantayhteys()->prepare($sql);
+        return $kysely->execute(array($ostoviite, $tilausnro));
     }
     
     /* Getterit ja setterit */

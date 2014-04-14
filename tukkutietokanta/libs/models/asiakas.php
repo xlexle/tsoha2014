@@ -19,6 +19,7 @@ class Asiakas {
 
     /* Tietokantafunktiot */
 
+    /* etsii yksittäisen asiakkaan tunnuksen ja salasanan perusteella */
     public static function etsiKirjautuja($tunnus, $salasana) {
         if (!is_numeric($tunnus) || !(floor($tunnus) == $tunnus)) {
             return null;
@@ -40,6 +41,7 @@ class Asiakas {
         }
     }
 
+    /* etsii yksittäisen asiakkaan tunnuksen perusteella */
     public static function etsiAsiakasAsiakasnumerolla($asiakasnro) {
         if (!is_numeric($asiakasnro) || !(floor($asiakasnro) == $asiakasnro)) {
             return null;
@@ -61,6 +63,7 @@ class Asiakas {
         }
     }
 
+    /* luo arrayn kaikista asiakkaista kirjautumistietojen listausta varten */
     public static function haeKaikkiAsiakkaat() {
         $sql = "SELECT tunnus, salasana FROM asiakas ORDER BY tunnus";
         $kysely = getTietokantayhteys()->prepare($sql);
@@ -76,6 +79,7 @@ class Asiakas {
         return $tulokset;
     }
 
+    /* hakee listan asiakkaita sivutustoiminnon avulla */
     public static function haeAsiakkaat($sivu, $tuloksia) {
         $sql = "SELECT tunnus, yritysnimi, email, puhelinnumero, luottoraja
             FROM asiakas ORDER BY tunnus LIMIT ? OFFSET ?";
@@ -96,6 +100,7 @@ class Asiakas {
         return $tulokset;
     }
 
+    /* laskee kaikkien asiakkaiden lukumäärän */
     public static function laskeLukumaara() {
         $sql = "SELECT count(*) FROM asiakas";
 
@@ -114,6 +119,7 @@ class Asiakas {
         return $asiakas;
     }
 
+    /* lisää yksittäisen asiakas-olion kantaan */
     public function lisaaKantaan() {
         $parametrit = array(
             self::generoiSalasana(8),
@@ -142,6 +148,7 @@ class Asiakas {
         return $this->tunnus;
     }
 
+    /* generoi uudelle asiakkaalle salasanan */
     private function generoiSalasana($pituus) {
         $merkit = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
         $kpl = mb_strlen($merkit);
@@ -154,6 +161,7 @@ class Asiakas {
         return $salasana;
     }
 
+    /* päivittää yksittäisen asiakas-olion kantaan */
     public function paivitaKantaan() {
         $parametrit = array(
             $this->getYritysnimi(),
@@ -181,6 +189,7 @@ class Asiakas {
         return $ok;
     }
 
+    /* poistaa asiakkaan kokonaan */
     public static function poistaKannasta($asiakasnro) {
         $sql = "DELETE FROM asiakas WHERE tunnus = ?";
         $kysely = getTietokantayhteys()->prepare($sql);

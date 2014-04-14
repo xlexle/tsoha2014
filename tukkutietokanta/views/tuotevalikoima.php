@@ -37,11 +37,12 @@
             <?php } endif; ?>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-4">
-                    <button type="submit" class="btn btn-default">Hae tuotteita</button>
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-th-list"></span> Hae tuotteita</button>
                 </div>
             </div>
         </form>
     </div>
+    <hr>
 
     <div class="row">
         <br>
@@ -54,7 +55,7 @@
             </div>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-4">
-                    <button type="submit" class="btn btn-default">Hae tuote</button>
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span> Hae tuote</button>
                 </div>
             </div>
         </form>  
@@ -63,8 +64,8 @@
     <?php if (onYllapitaja()): { ?>
         <div class="row">
             <br>
-            <p><a class="btn btn-default" href="tuotevalikoima.php?haku=avoimet">Listaa tuotteet joista avoimia tilauksia</a></p>
-            <p><a class = "btn btn-default" href = "tuotevalikoima.php?tuote=uusi">Uusi tuote</a></p>
+            <p><a class="btn btn-default col-md-offset-2" href="tuotevalikoima.php?haku=avoimet"><span class="glyphicon glyphicon-th-list"></span> Listaa tuotteet joista avoimia tilauksia</a></p>
+            <p><a class = "btn btn-default col-md-offset-2" href = "tuotevalikoima.php?tuote=uusi"><span class="glyphicon glyphicon-plus-sign"></span> Uusi tuote</a></p>
         </div>
     <?php } endif; ?>
 </div>

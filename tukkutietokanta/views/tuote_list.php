@@ -24,6 +24,7 @@
             </div>
         </div>
     <?php } endif; ?>
+    <hr>
 
     <div class="row">
         <table class="table table-striped">
@@ -54,7 +55,7 @@
                 </tr>
             </thead>
             <tbody>
-                <?php $rivi = $data->rivi;
+            <?php $rivi = $data->rivi;
                 foreach ($data->tuotteet as $tuote):?>
                 <tr>
                     <td><?php echo $rivi++;?></td>
@@ -73,38 +74,23 @@
                             <td><?php echo $tuote->getAvoimiaTilauksia();?></td>
                         <?php } endif; ?>
                     <?php } endif; ?>
-                    <td><a href="tuotevalikoima.php?tuotenro=<?php echo $tuote->getTuotenro();?>"
-                        class="btn btn-xs btn-default" target="_blank"><span class="glyphicon glyphicon-eye-open"></span>
-                        </a>
-                    </td>  
+                    <td><a href="tuotevalikoima.php?tuotenro=<?php echo $tuote->getTuotenro();?>" target="_blank" title="Avaa tuotetiedot"><span class="glyphicon glyphicon-eye-open"></span></a></td>  
                     <?php if (onYllapitaja()): { ?>
                         <?php if (!$data->poistettu): { ?>
-                            <td><a href="tuotevalikoima.php?muokkaa=<?php echo $tuote->getTuotenro();?>" 
-                                class="btn btn-xs btn-default" target="_blank"><span class="glyphicon glyphicon-wrench"></span>
-                                </a>
-                            </td>
-                            <td><a href="#" class="btn btn-xs btn-default"><span 
-                                class="glyphicon glyphicon-th-list" target="_blank"></span> Avoimet tilaukset
-                                </a>
-                            </td>
+                            <td><a href="tuotevalikoima.php?muokkaa=<?php echo $tuote->getTuotenro();?>" target="_blank" title="Muokkaa tuotetietoja"><span class="glyphicon glyphicon-wrench"></span></a></td>
+                            <td><a href="#" ><span class="glyphicon glyphicon-th-list" target="_blank" title="Listaa avoimet tilaukset"></span></a></td>
                         <?php } endif; ?>
-                        <td><a href="#" class="btn btn-xs btn-default"><span 
-                            class="glyphicon glyphicon-th-list" target="_blank"></span> Kaikki tilaukset
-                            </a>
-                        </td>
                     <?php } else: { ?>
-                        <td><a href="ostoskori.php?lisaaostos=<?php echo $tuote->getTuotenro();?>" class="btn btn-xs btn-default"><span 
-                            class="glyphicon glyphicon-shopping-cart" target="_blank"></span> 
-                            </a>
-                        </td>
+                        <td><a href="ostoskori.php?lisaaostos=<?php echo $tuote->getTuotenro();?>"><span class="glyphicon glyphicon-shopping-cart" target="_blank" title="Lisää ostoskoriin 1 kpl"></span></a></td>
                     <?php } endif; ?>
                 </tr>
-                <?php endforeach; ?>
+            <?php endforeach; ?>
             </tbody>
         </table>
     </div>
+    <hr>
 
     <div class="row">
-        <p><a class = "btn btn-default" href = "tuotevalikoima.php?haku=uusi">Uusi haku</a></p>
+        <p><a class="btn btn-default col-md-offset-2" href="tuotevalikoima.php?haku=uusi"><span class="glyphicon glyphicon-repeat"></span> Uusi haku</a></p>
     </div>
 </div>

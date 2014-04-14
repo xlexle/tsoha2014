@@ -35,11 +35,11 @@ switch ($_GET['haku']) {
                 'laskutettu' => $laskutettu,
                 'maksettu' => $maksettu
             );
-            
+
             if (!empty($asiakasnro) && !($asiakasnro > 1000 && $asiakasnro < 10000)) {
                 unset($data['asiakasnro']);
                 $data['error'] = "Haku epäonnistui, koska asiakasnumero ei ollut 4-numeroinen luku.";
-                siirryKontrolleriin("tilausseuranta", $data);   
+                siirryKontrolleriin("tilausseuranta", $data);
             }
 
             $_SESSION['ehdot'] = $data;
@@ -86,6 +86,7 @@ function listaaTilaukset($lomaketiedot, $sivu, $naytetaan) {
     naytaNakyma("tilaus_list", 3, $data);
 }
 
+/* haetaan yksittäinen tilaus */
 if (isset($_GET['tilausnro'])) {
     $tilausnro = htmlspecialchars($_GET['tilausnro'], ENT_QUOTES);
 
@@ -108,25 +109,13 @@ if (isset($_GET['tilausnro'])) {
             'tilausnro' => $tilausnro
         ));
     }
-
-    $data = (array) $_SESSION['data'];
-    $data['tilaus'] = $tilaus;
-    $data['ostokset'] = Ostos::haeOstokset($tilausnro);
-
-    $toimitettu = $tilaus->getToimitettu();
-    if (!empty($toimitettu))
-        $data['toimitettu'] = true;
-    $laskutettu = $tilaus->getLaskutettu();
-    if (!empty($laskutettu))
-        $data['laskutettu'] = true;
-    $maksettu = $tilaus->getMaksettu();
-    if (!empty($maksettu))
-        $data['maksettu'] = true;
-
+    
+    $data = (array) maaritaSivuMuuttujat($tilaus, $tilausnro);
+    
     naytaNakyma("tilaus", 3, $data);
 }
 
-/* Siirrytään tilauksen muokkaustilaan */
+/* siirrytään tilauksen muokkaustilaan */
 if (isset($_GET['muokkaa'])) {
     yllapitajaTarkistus();
     $tilausnro = htmlspecialchars($_GET['muokkaa'], ENT_QUOTES);
@@ -137,52 +126,70 @@ if (isset($_GET['muokkaa'])) {
             'error' => "Tilausta ei löytynyt.",
         ));
     }
+    
+    $toimitettu = $tilaus->getToimitettu();
+    if (!empty($toimitettu)) {
+        siirryKontrolleriin('tilausseuranta.php?tilausnro=' . $tilausnro, array(
+            'error' => "Tilausta ei voi enää muokata.",
+        ));
+    }
+    
+    /* päivitetään ostoviite */
+    if (isset($_POST['ostoviite'])) {
+        $ostoviite = htmlspecialchars($_POST['ostoviite'], ENT_QUOTES);
+        if (empty($ostoviite)) {
+            siirryKontrolleriin('tilausseuranta.php?muokkaa=' . $tilausnro, array(
+                'error' => "Tallennus epäonnistui, koska ostoviite puuttui.",
+            ));
+        }
+        
+        if (Tilaus::asetaViite($tilausnro, substr($ostoviite, 0, 50))) {
+            siirryKontrolleriin('tilausseuranta.php?tilausnro=' . $tilausnro);
+        }
+        
+        siirryKontrolleriin('tilausseuranta.php?tilausnro=' . $tilausnro, array(
+            'error' => 'Virhe tietokantaoperaatiossa päivitettäessä tilausta ' . $tilausnro,
+        ));
+    }
+    
+    /* päivitetään tilausrivin kappalemäärä */
+    if (isset($_POST['rivi']) && isset($_POST['kpl'])) {
+        $tilausrivi = $_POST['rivi'];
+        $maara = $_POST['kpl'];
+        if (is_numeric($maara)) {
+            if ($maara < 0) {
+                $maara = 0;
+            }
+            Ostos::asetaMaara($tilausnro, $tilausrivi, floor($maara));
+        }
+    }
 
-    $data = (array) $_SESSION['data'];
-    $data['tilaus'] = $tilaus;
+    $data = (array) maaritaSivuMuuttujat($tilaus, $tilausnro);
     $data['muokkaa'] = true;
 
     naytaNakyma("tilaus", 3, $data);
 }
 
-/* Tallennetaan tilaukseen tehdyt muutokset */
-if (isset($_GET['tallenna'])) {
-    yllapitajaTarkistus();
-    $tilausnro = htmlspecialchars($_GET['tallenna'], ENT_QUOTES);
-    $tilaus = Tilaus::etsiTilausTilausnumerolla($tilausnro);
+/* */
+function maaritaSivuMuuttujat($tilaus, $tilausnro) {
+    $data = (array) $_SESSION['data'];
+    $data['tilaus'] = $tilaus;
+    $data['ostokset'] = Ostos::haeOstokset($tilausnro);
 
-    if (empty($tilausnro) || is_null($tilaus)) {
-        siirryKontrolleriin("tilausseuranta", array(
-            'error' => "Tilausta ei löytynyt.",
-        ));
-    }
-
-    $ostoviite = htmlspecialchars($_POST['ostoviite'], ENT_QUOTES);
-    $kokonaisarvo = htmlspecialchars($_POST['kokonaisarvo'], ENT_QUOTES); /* not like this ... */
-
-    $lomaketiedot = array(
-        'ostoviite' => $ostoviite,
-        'kokonaisarvo' => $kokonaisarvo
-    );
-
-    tarkistaTallennusLomake($lomaketiedot, 'muokkaa=' . $tilausnro);
-
-    /* Luodaan uusi tuote tietokantaan */
-    $paivitettavaTilaus = luoUusiTilausOlio($ostoviite, $kokonaisarvo);
-    $paivitettavaTilaus->setTilausnro($tilausnro);
-    if ($paivitettavaTilaus->paivitaKantaan()) {
-        siirryKontrolleriin("tilausseuranta", array(
-            'success' => 'Tilaus ' . $tilausnro . ' on päivitetty onnistuneesti.'
-        ));
-    }
-
-    siirryKontrolleriin("tilausseuranta", array(
-        'error' => 'Virhe tietokantaoperaatiossa päivitettäessä tilausta ' . $tilausnro
-    ));
+    $toimitettu = $tilaus->getToimitettu();
+    if (!empty($toimitettu)) $data['toimitettu'] = true;
+    $laskutettu = $tilaus->getLaskutettu();
+    if (!empty($laskutettu)) $data['laskutettu'] = true;
+    $maksettu = $tilaus->getMaksettu();
+    if (!empty($maksettu)) $data['maksettu'] = true;
+    
+    return $data;
 }
 
+/* luodaan uusi tilaus ostoskorin sisältämien ostosten perusteella */
 switch ($_GET['ostoskori']) {
     case "laheta":
+        asiakasTarkistus();
         $ostoviite = htmlspecialchars($_POST["ostoviite"], ENT_QUOTES);
         if (empty($ostoviite)) {
             siirryKontrolleriin("ostoskori", array(
@@ -210,12 +217,14 @@ function tarkistaTallennusLomake($data, $get) {
     }
 }
 
+/* lasketaan ostosten yhteisarvo tilauksen kokonaisarvo-saraketta varten */
+
 function laskeKokonaisArvo($ostokset) {
     $kokonaisarvo = 0;
     foreach ($ostokset as $ostos) {
         $kokonaisarvo += $ostos->getMaara() * $ostos->getOstohinta();
     }
-    
+
     return $kokonaisarvo;
 }
 
