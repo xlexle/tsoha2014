@@ -102,16 +102,19 @@ if (isset($_GET['tilausnro'])) {
         ));
     }
 
-    $tilaus = Tilaus::etsiTilausTilausnumerolla($tilausnro);
+    $tilaus;
+    if (onYllapitaja()) $tilaus = Tilaus::etsiTilausTilausnumerolla($tilausnro);
+    else $tilaus = Tilaus::etsiAsiakkaanTilaus($tilausnro, $_SESSION['kirjautunut']);
+        
     if (is_null($tilaus)) {
         siirryKontrolleriin("tilausseuranta", array(
             'error' => "Tilausnumerolla ei löytynyt tilausta.",
             'tilausnro' => $tilausnro
         ));
     }
-    
+
     $data = (array) maaritaSivuMuuttujat($tilaus, $tilausnro);
-    
+
     naytaNakyma("tilaus", 3, $data);
 }
 
@@ -126,14 +129,14 @@ if (isset($_GET['muokkaa'])) {
             'error' => "Tilausta ei löytynyt.",
         ));
     }
-    
+
     $toimitettu = $tilaus->getToimitettu();
     if (!empty($toimitettu)) {
         siirryKontrolleriin('tilausseuranta.php?tilausnro=' . $tilausnro, array(
             'error' => "Tilausta ei voi enää muokata.",
         ));
     }
-    
+
     /* päivitetään ostoviite */
     if (isset($_POST['ostoviite'])) {
         $ostoviite = htmlspecialchars($_POST['ostoviite'], ENT_QUOTES);
@@ -142,16 +145,16 @@ if (isset($_GET['muokkaa'])) {
                 'error' => "Tallennus epäonnistui, koska ostoviite puuttui.",
             ));
         }
-        
+
         if (Tilaus::asetaViite($tilausnro, substr($ostoviite, 0, 50))) {
             siirryKontrolleriin('tilausseuranta.php?tilausnro=' . $tilausnro);
         }
-        
+
         siirryKontrolleriin('tilausseuranta.php?tilausnro=' . $tilausnro, array(
             'error' => 'Virhe tietokantaoperaatiossa päivitettäessä tilausta ' . $tilausnro,
         ));
     }
-    
+
     /* päivitetään tilausrivin kappalemäärä */
     if (isset($_POST['rivi']) && isset($_POST['kpl'])) {
         $tilausrivi = $_POST['rivi'];
@@ -171,18 +174,22 @@ if (isset($_GET['muokkaa'])) {
 }
 
 /* */
+
 function maaritaSivuMuuttujat($tilaus, $tilausnro) {
     $data = (array) $_SESSION['data'];
     $data['tilaus'] = $tilaus;
     $data['ostokset'] = Ostos::haeOstokset($tilausnro);
 
     $toimitettu = $tilaus->getToimitettu();
-    if (!empty($toimitettu)) $data['toimitettu'] = true;
+    if (!empty($toimitettu))
+        $data['toimitettu'] = true;
     $laskutettu = $tilaus->getLaskutettu();
-    if (!empty($laskutettu)) $data['laskutettu'] = true;
+    if (!empty($laskutettu))
+        $data['laskutettu'] = true;
     $maksettu = $tilaus->getMaksettu();
-    if (!empty($maksettu)) $data['maksettu'] = true;
-    
+    if (!empty($maksettu))
+        $data['maksettu'] = true;
+
     return $data;
 }
 

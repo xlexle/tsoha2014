@@ -6,17 +6,17 @@
             <div class="form-group">
                 <label for="ostoviite" class="col-md-2 control-label">Ostoviite</label>
                 <div class="col-md-4">
-                    <?php if ($data->muokkaa): { ?>
+                    <?php if ($data->muokkaa):?>
                         <input type="text" maxlength="50" class="form-control" id="ostoviite" name="ostoviite" value="<?php echo $tilaus->getOstoviite();?>">
-                    <?php } else: { ?>
+                    <?php else:?>
                         <p class="form-control-static"><?php echo $tilaus->getOstoviite();?></p>
-                    <?php } endif; ?>
+                    <?php endif;?>
                 </div>
-                <?php if ($data->muokkaa): { ?>
+                <?php if ($data->muokkaa): ?>
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> Tallenna viite</button>
                     </div>
-                <?php } endif; ?>
+                <?php endif;?>
             </div>
             <div class="form-group">
                 <label class="col-md-2 control-label">Asiakas</label>
@@ -30,36 +30,36 @@
                     <p class="form-control-static"><?php echo formatoi($tilaus->getSaapumisaika());?></p>
                 </div>
             </div>
-            <?php if ($data->toimitettu): { ?>
+            <?php if ($data->toimitettu): ?>
                 <div class="form-group">
                     <label class="col-md-2 control-label">Toimitettu</label>
                     <div class="col-md-2">
                         <p class="form-control-static"><?php echo formatoi($tilaus->getToimitettu());?></p>
                     </div>
                 </div>
-            <?php } endif; ?>
-            <?php if ($data->laskutettu): { ?>
+            <?php endif; ?>
+            <?php if ($data->laskutettu):?>
                 <div class="form-group">
                     <label class="col-md-2 control-label">Laskutettu</label>
                     <div class="col-md-2">
                         <p class="form-control-static"><?php echo formatoi($tilaus->getLaskutettu());?></p>
                     </div>
                 </div>
-            <?php if ($data->maksettu): { ?>
-            <?php } endif; ?>
+            <?php if ($data->maksettu):?>
+            <?php endif; ?>
                 <div class="form-group">
                     <label class="col-md-2 control-label">Maksettu</label>
                     <div class="col-md-2">
                         <p class="form-control-static"><?php echo formatoi($tilaus->getMaksettu());?></p>
                     </div>
                 </div>
-            <?php } endif; ?>
+            <?php endif; ?>
         </form>
     </div>
 
     <div class="row">
         <hr>
-        <?php if ($data->muokkaa): { ?>
+        <?php if ($data->muokkaa):?>
             <form class="form-horizontal" action="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" method="POST">
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-1">
@@ -73,7 +73,7 @@
                     </div>
                 </div>
             </form><br>
-        <?php } endif; ?>
+        <?php endif;?>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -83,9 +83,9 @@
                     <th>Valmistaja</th>
                     <th>EUR / kpl</th>
                     <th>Kappalemäärä</th>
-                    <?php if (!$data->toimitettu): { ?>
+                    <?php if (!$data->toimitettu):?>
                         <th>Varastossa</th>
-                    <?php } endif; ?>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
@@ -97,11 +97,11 @@
                         <td><?php echo $ostos->getValmistaja();?></td>
                         <td><?php echo $ostos->getOstohinta();?></td>
                         <td><?php echo $ostos->getMaara();?></td>
-                        <?php if (!$data->toimitettu): { ?>
+                        <?php if (!$data->toimitettu):?>
                             <td><?php echo $ostos->getSaldo();?></td>
-                        <?php } endif; ?>
+                        <?php endif;?>
                     </tr>
-                <?php endforeach; ?>
+                <?php endforeach;?>
             </tbody>
         </table>
         
@@ -121,7 +121,7 @@
     
     
     <div class="row">
-        <?php if (!$data->muokkaa && !$data->toimitettu && onYllapitaja()): { ?>
+        <?php if (!$data->muokkaa && !$data->toimitettu && onYllapitaja()):?>
             <form class="form-horizontal" action="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" method="POST">
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-4">
@@ -129,8 +129,8 @@
                     </div>
                 </div>
             </form>
-        <?php } endif; ?>
-        <?php if (!$data->muokkaa): { ?>
+        <?php endif;?>
+        <?php if (!$data->muokkaa):?>
             <form class="form-horizontal" action="tilausseuranta.php?haku=uusi" method="POST">
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-4">
@@ -138,7 +138,7 @@
                     </div>
                 </div>
             </form>
-        <?php } else: { ?>
+        <?php else:?>
             <form class="form-horizontal" action="tilausseuranta.php?tilausnro=<?php echo $tilaus->getTilausnro();?>" method="POST">
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-4">
@@ -146,7 +146,7 @@
                     </div>
                 </div>
             </form>
-        <?php } endif; ?>
+        <?php endif;?>
         <br>
     </div>
 </div>

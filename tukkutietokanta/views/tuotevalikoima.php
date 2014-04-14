@@ -26,7 +26,7 @@
                     <input type="number" min="0" class="form-control" id="saldo_min" name="saldo_min" value="<?php echo $data->saldo_min;?>" placeholder="kpl">
                 </div>
             </div>
-            <?php if (onYllapitaja()): { ?>
+            <?php if (onYllapitaja()):?>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-3">
                         <div class="checkbox">
@@ -34,7 +34,7 @@
                         </div>
                     </div>
                 </div>
-            <?php } endif; ?>
+            <?php endif;?>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-4">
                     <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-th-list"></span> Hae tuotteita</button>
@@ -61,11 +61,11 @@
         </form>  
     </div>
 
-    <?php if (onYllapitaja()): { ?>
+    <?php if (onYllapitaja()):?>
         <div class="row">
             <br>
             <p><a class="btn btn-default col-md-offset-2" href="tuotevalikoima.php?haku=avoimet"><span class="glyphicon glyphicon-th-list"></span> Listaa tuotteet joista avoimia tilauksia</a></p>
             <p><a class = "btn btn-default col-md-offset-2" href = "tuotevalikoima.php?tuote=uusi"><span class="glyphicon glyphicon-plus-sign"></span> Uusi tuote</a></p>
         </div>
-    <?php } endif; ?>
+    <?php endif;?>
 </div>

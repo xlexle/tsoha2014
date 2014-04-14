@@ -1,9 +1,9 @@
 <div class="container">
     <div class="row">
-        <h2><?php $kpl = $data->tuloksia; echo $kpl; ?> hakutulos<?php if ($kpl != 1): {?>ta<?php } endif;?></h2><br>
+        <h2><?php $kpl = $data->tuloksia; echo $kpl; ?> hakutulos<?php if ($kpl != 1):?>ta<?php endif;?></h2><br>
     </div>
 
-    <?php if ($data->sivuja > 1): {?>
+    <?php if ($data->sivuja > 1):?>
         <div class="row">
             <div class="btn-group">            
                 <a <?php if ($data->sivu > 1): ?>
@@ -23,7 +23,7 @@
                 </a>
             </div>
         </div>
-    <?php } endif; ?>
+    <?php endif;?>
     <hr>
 
     <div class="row">
@@ -42,7 +42,7 @@
             </thead>
             <tbody>
             <?php $rivi = $data->rivi;
-            foreach ($data->tilaukset as $tilaus): {;?>
+            foreach ($data->tilaukset as $tilaus):;?>
                 <tr>
                     <td><?php echo $rivi++;?></td>
                     <td><?php echo $tilaus->getTilausnro();?></td>
@@ -51,11 +51,11 @@
                     <td><?php echo $tilaus->getKokonaisarvo();?></td>
                     <td><?php echo formatoi($tilaus->getSaapumisaika());?></td>
                     <td><a href="tilausseuranta.php?tilausnro=<?php echo $tilaus->getTilausnro();?>" target="_blank" title="Avaa tilaus"><span class="glyphicon glyphicon-eye-open"></span></a></td>
-                    <?php if (onYllapitaja()): { ?>
+                    <?php if (onYllapitaja()):?>
                         <td><a href="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" target="_blank" title="Muokkaa tilausta"><span class="glyphicon glyphicon-wrench"></span></a></td>
-                    <?php } endif; ?>
+                    <?php endif;?>
                 </tr>
-            <?php } endforeach; ?>
+            <?php endforeach;?>
             </tbody>
         </table>
     </div>

@@ -21,10 +21,34 @@ class Tilaus {
     /* hakee yksittäisen tilauksen kannasta */
     public static function etsiTilausTilausnumerolla($tilausnro) {
         if (!is_numeric($tilausnro) || !(floor($tilausnro) == $tilausnro)) return null;
+        return self::haeTilaus(array($tilausnro));
+    }
+    
+    /* hakee tietyn asiakkaan yksittäisen tilauksen */
+    public static function etsiAsiakkaanTilaus($tilausnro, $asiakasnro) {
+        if (!is_numeric($tilausnro) || !(floor($tilausnro) == $tilausnro)) return null;
+        if (!is_numeric($asiakasnro) || !(floor($asiakasnro) == $asiakasnro)) return null;
+        return self::haeTilaus(array($tilausnro, $asiakasnro));
+    }
+    
+    private function haeTilaus($array) {
         $sql = "SELECT tilausnro, ostoviite, kokonaisarvo, saapumisaika, toimitettu, laskutettu, maksettu, asiakasnro
-            FROM tilaus WHERE tilausnro = ? LIMIT 1";
+            FROM tilaus WHERE TRUE";
+        
+        $hakuehdot = (array) $array;
+        $parametrit = array();
+        if (isset($hakuehdot['tilausnro'])) {
+            $parametrit[] = $hakuehdot['tilausnro'];
+            $sql .= " AND tilausnro = ?";
+        }
+        if (isset($hakuehdot['asiakasnro'])) {
+            $parametrit[] = $parametrit['asiakasnro'];
+            $sql .= " AND asiakasnro = ?";
+        }
+        $sql .= " LIMIT 1";
+        
         $kysely = getTietokantayhteys()->prepare($sql);
-        $kysely->execute(array($tilausnro));
+        $kysely->execute($parametrit);
 
         $tulos = $kysely->fetchObject();
         if ($tulos == null) {

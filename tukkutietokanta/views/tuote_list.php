@@ -1,29 +1,29 @@
 <div class="container">
     <div class="row">
-        <h2><?php $kpl = $data->tuloksia; echo $kpl; ?> hakutulos<?php if ($kpl != 1): {?>ta<?php } endif;?></h2><br>
+        <h2><?php $kpl = $data->tuloksia; echo $kpl; ?> hakutulos<?php if ($kpl != 1):?>ta<?php endif;?></h2><br>
     </div>
 
-    <?php if ($data->sivuja > 1): {?>
+    <?php if ($data->sivuja > 1):?>
         <div class="row">
             <div class="btn-group">            
-                <a <?php if ($data->sivu > 1): ?>
+                <a <?php if ($data->sivu > 1):?>
                     href="tuotevalikoima.php?haku=listaa&sivu=<?php echo $data->sivu - 1; ?>"
-                    <?php endif; ?> class="btn btn-default" 
-                    <?php if ($data->sivu == 1): ?>disabled<?php endif; ?>>
+                    <?php endif;?> class="btn btn-default" 
+                    <?php if ($data->sivu == 1):?>disabled<?php endif;?>>
                     <span class="glyphicon glyphicon-arrow-left"></span>
                 </a>
                 <button class="btn btn-success" disabled>
                     sivu <?php echo $data->sivu; ?> / <?php echo $data->sivuja; ?>
                 </button>
                 <a <?php if ($data->sivu < $data->sivuja): ?>
-                        href="tuotevalikoima.php?haku=listaa&sivu=<?php echo $data->sivu + 1; ?>"
+                        href="tuotevalikoima.php?haku=listaa&sivu=<?php echo $data->sivu + 1;?>"
                     <?php endif; ?> class="btn btn-default"
-                    <?php if ($data->sivu >= $data->sivuja): ?>disabled<?php endif; ?>>
+                    <?php if ($data->sivu >= $data->sivuja):?>disabled<?php endif;?>>
                     <span class="glyphicon glyphicon-arrow-right"></span>
                 </a>
             </div>
         </div>
-    <?php } endif; ?>
+    <?php endif;?>
     <hr>
 
     <div class="row">
@@ -35,22 +35,22 @@
                     <th>Valmistajan koodi</th>
                     <th>Kuvaus</th>
                     <th>Valmistaja</th>
-                    <?php if (!$data->poistettu): { ?>
+                    <?php if (!$data->poistettu):?>
                         <th>Varastossa</th>
-                    <?php } endif; ?>
+                    <?php endif;?>
                     <th>EUR</th>
-                    <?php if (onYllapitaja()): { ?>
-                        <?php if ($data->poistettu): { ?>
+                    <?php if (onYllapitaja()):?>
+                        <?php if ($data->poistettu):?>
                             <th>Poistettu</th>
-                        <?php } else: { ?>
+                        <?php else:?>
                             <th>Avoimia tilauksia</th>
-                        <?php } endif; ?>
-                    <?php } endif; ?>
+                        <?php endif;?>
+                    <?php endif;?>
                     <th>&nbsp;</th>
-                    <?php if (onYllapitaja()): { ?>
+                    <?php if (onYllapitaja()):?>
                         <th>&nbsp;</th>
                         <th>&nbsp;</th>
-                    <?php } endif; ?>
+                    <?php endif;?>
                     <th>&nbsp;</th>
                 </tr>
             </thead>
@@ -63,26 +63,26 @@
                     <td><?php echo $tuote->getKoodi();?></td>
                     <td><?php echo $tuote->getKuvaus();?></td>
                     <td><?php echo $tuote->getValmistaja();?></td>
-                    <?php if (!$data->poistettu): { ?>
+                    <?php if (!$data->poistettu):?>
                         <td><?php echo $tuote->getSaldo();?></td>
-                    <?php } endif; ?>
+                    <?php endif;?>
                     <td><?php echo $tuote->getHinta();?></td>
-                    <?php if (onYllapitaja()): { ?>
-                        <?php if ($data->poistettu): { ?>
+                    <?php if (onYllapitaja()):?>
+                        <?php if ($data->poistettu):?>
                             <td><?php echo formatoi($tuote->getPoistettu());?></td>
-                        <?php } else: { ?>
+                        <?php else:?>
                             <td><?php echo $tuote->getAvoimiaTilauksia();?></td>
-                        <?php } endif; ?>
-                    <?php } endif; ?>
+                        <?php endif;?>
+                    <?php endif;?>
                     <td><a href="tuotevalikoima.php?tuotenro=<?php echo $tuote->getTuotenro();?>" target="_blank" title="Avaa tuotetiedot"><span class="glyphicon glyphicon-eye-open"></span></a></td>  
-                    <?php if (onYllapitaja()): { ?>
-                        <?php if (!$data->poistettu): { ?>
+                    <?php if (onYllapitaja()):?>
+                        <?php if (!$data->poistettu):?>
                             <td><a href="tuotevalikoima.php?muokkaa=<?php echo $tuote->getTuotenro();?>" target="_blank" title="Muokkaa tuotetietoja"><span class="glyphicon glyphicon-wrench"></span></a></td>
                             <td><a href="#" ><span class="glyphicon glyphicon-th-list" target="_blank" title="Listaa avoimet tilaukset"></span></a></td>
-                        <?php } endif; ?>
-                    <?php } else: { ?>
+                        <?php endif;?>
+                    <?php else:?>
                         <td><a href="ostoskori.php?lisaaostos=<?php echo $tuote->getTuotenro();?>"><span class="glyphicon glyphicon-shopping-cart" target="_blank" title="Lisää ostoskoriin 1 kpl"></span></a></td>
-                    <?php } endif; ?>
+                    <?php endif;?>
                 </tr>
             <?php endforeach; ?>
             </tbody>

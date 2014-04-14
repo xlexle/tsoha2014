@@ -1,9 +1,9 @@
 <div class="container">
     <div class="row">
-        <h2><?php $kpl = $data->tuloksia; echo $kpl; ?> hakutulos<?php if ($kpl != 1): {?>ta<?php } endif;?></h2><br>
+        <h2><?php $kpl = $data->tuloksia; echo $kpl; ?> hakutulos<?php if ($kpl != 1):?>ta<?php endif;?></h2><br>
     </div>
 
-    <?php if ($data->sivuja > 1): {?>
+    <?php if ($data->sivuja > 1):?>
         <div class="row">
             <div class="btn-group">            
                 <a <?php if ($data->sivu > 1): ?>
@@ -23,7 +23,7 @@
                 </a>
             </div>
         </div>
-    <?php } endif; ?>
+    <?php endif; ?>
     <hr>
 
     <div class="row">

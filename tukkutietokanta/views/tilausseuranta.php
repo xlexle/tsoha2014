@@ -2,14 +2,14 @@
     <div class="row">
         <h2>Tilausseuranta</h2><br>
         <form class="form-horizontal" action="tilausseuranta.php?haku=listaa" method="POST">
-            <?php if (onYllapitaja()): { ?>
+            <?php if (onYllapitaja()):?>
                     <div class="form-group">
                         <label for="asiakasnro" class="col-md-2 control-label">Asiakasnumero</label>
                         <div class="col-md-2">
                             <input type="text" maxlength="4" class="form-control" id="asiakasnro" name="asiakasnro" placeholder="4 numeroa">
                         </div>
                     </div>
-                <?php } endif; ?>
+                <?php endif;?>
             <div class="form-group">
                 <label for="viite" class="col-md-2 control-label">Ostoviite</label>
                 <div class="col-md-4">
