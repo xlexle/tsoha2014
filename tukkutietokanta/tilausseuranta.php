@@ -102,17 +102,24 @@ if (isset($_GET['tilausnro'])) {
         ));
     }
 
-    $tilaus;
-    if (onYllapitaja()) $tilaus = Tilaus::etsiTilausTilausnumerolla($tilausnro);
-    else $tilaus = Tilaus::etsiAsiakkaanTilaus($tilausnro, $_SESSION['kirjautunut']);
-        
+    if (onYllapitaja()) {
+        $tilaus = Tilaus::etsiTilausTilausnumerolla($tilausnro);
+        naytaTilaus($tilaus, $tilausnro);
+    } else {
+        $asiakasnro = $_SESSION['kirjautunut'];
+        $tilaus = Tilaus::etsiAsiakkaanTilaus($tilausnro, $asiakasnro);
+        naytaTilaus($tilaus, $tilausnro);
+    }
+}
+
+function naytaTilaus($tilaus, $tilausnro) {
     if (is_null($tilaus)) {
         siirryKontrolleriin("tilausseuranta", array(
             'error' => "Tilausnumerolla ei löytynyt tilausta.",
             'tilausnro' => $tilausnro
         ));
     }
-
+    
     $data = (array) maaritaSivuMuuttujat($tilaus, $tilausnro);
 
     naytaNakyma("tilaus", 3, $data);
@@ -212,9 +219,7 @@ switch ($_GET['ostoskori']) {
             $ostos->lisaaKantaan($tilausnro);
         }
 
-        siirryKontrolleriin('tilausseuranta.php?tilausnro=' . $tilausnro, array(
-            'success' => 'Tilaus luotu onnistuneesti.'
-        ));
+        siirryKontrolleriin('tilausseuranta.php?tilausnro=' . $tilausnro);
 }
 
 function tarkistaTallennusLomake($data, $get) {
