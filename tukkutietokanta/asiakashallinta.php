@@ -143,6 +143,14 @@ if (isset($_GET['poista'])) {
             'error' => "Asiakasta ei löytynyt.",
         ));
     }
+    
+    $avoimiatilauksia = (int) Asiakas::avoimiaTilauksia($asiakasnro);
+    $maksamattomialaskuja = (int) Asiakas::maksamattomiaLaskuja($asiakasnro);
+    if ($avoimiatilauksia > 0 || $maksamattomialaskuja > 0) {
+        siirryKontrolleriin('asiakashallinta.php?asiakasnro=' . $asiakasnro, array(
+            'error' => 'Poisto epäonnistui, koska asiakkaalla ' . $asiakasnro . ' on avoimia tilauksia tai maksamattomia laskuja.'
+        ));
+    }
 
     if (Asiakas::poistaKannasta($asiakasnro)) {
         siirryKontrolleriin("asiakashallinta", array(

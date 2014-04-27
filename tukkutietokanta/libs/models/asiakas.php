@@ -188,6 +188,26 @@ class Asiakas {
         $ok = $kysely->execute($parametrit);
         return $ok;
     }
+    
+    public static function avoimiaTilauksia($asiakasnro) {
+        $sql = "SELECT count(*) FROM tilaus
+            WHERE asiakasnro = ? AND toimitettu IS NULL";
+        
+        $kysely = getTietokantayhteys()->prepare($sql);
+        $kysely->execute(array($asiakasnro));
+        return $kysely->fetchColumn();
+    }
+    
+    public static function maksamattomiaLaskuja($asiakasnro) {
+        $sql = "SELECT count(*) FROM tilaus
+            WHERE asiakasnro = ? 
+            AND laskutettu IS NOT NULL
+            AND maksettu IS NULL";
+        
+        $kysely = getTietokantayhteys()->prepare($sql);
+        $kysely->execute(array($asiakasnro));
+        return $kysely->fetchColumn();
+    }
 
     /* poistaa asiakkaan kokonaan */
     public static function poistaKannasta($asiakasnro) {
