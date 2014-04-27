@@ -32,7 +32,7 @@ create table tuote(
 create table tilaus(
 	tilausnro integer DEFAULT nextval('tilaus_id') PRIMARY KEY,
 	ostoviite varchar(50),
-	kokonaisarvo dec(9,2),
+	kokonaisarvo decimal(9,2),
 	saapumisaika timestamp NOT NULL DEFAULT localtimestamp,
 	toimitettu timestamp,
 	laskutettu timestamp,
@@ -45,7 +45,8 @@ create table ostos(
 	tuotenro integer REFERENCES tuote ON DELETE RESTRICT,
 	tilausrivi integer NOT NULL,
 	ostohinta dec(9,2) NOT NULL,
-	maara integer NOT NULL,
+	allokoitumaara integer NOT NULL,
+	tilattumaara integer NOT NULL,
 	CONSTRAINT pk_ostos 
 		PRIMARY KEY (tilausnro, tilausrivi)
 );

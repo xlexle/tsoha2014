@@ -158,20 +158,8 @@ if (isset($_GET['muokkaa'])) {
         }
 
         siirryKontrolleriin('tilausseuranta.php?tilausnro=' . $tilausnro, array(
-            'error' => 'Virhe tietokantaoperaatiossa päivitettäessä tilausta ' . $tilausnro,
+            'error' => 'Virhe tietokantaoperaatiossa päivitettäessä tilausta ' . $tilausnro
         ));
-    }
-
-    /* päivitetään tilausrivin kappalemäärä */
-    if (isset($_POST['rivi']) && isset($_POST['kpl'])) {
-        $tilausrivi = $_POST['rivi'];
-        $maara = $_POST['kpl'];
-        if (is_numeric($maara)) {
-            if ($maara < 0) {
-                $maara = 0;
-            }
-            Ostos::asetaMaara($tilausnro, $tilausrivi, floor($maara));
-        }
     }
 
     $data = (array) maaritaSivuMuuttujat($tilaus, $tilausnro);
@@ -179,8 +167,6 @@ if (isset($_GET['muokkaa'])) {
 
     naytaNakyma("tilaus", 3, $data);
 }
-
-/* */
 
 function maaritaSivuMuuttujat($tilaus, $tilausnro) {
     $data = (array) $_SESSION['data'];
@@ -216,6 +202,7 @@ switch ($_GET['ostoskori']) {
         $lisattavaTilaus = luoUusiTilausOlio($ostoviite, laskeKokonaisArvo($ostokset));
         $tilausnro = $lisattavaTilaus->lisaaKantaan();
         foreach ($ostokset as $ostos) {
+            $ostos->siirraSaldot();
             $ostos->lisaaKantaan($tilausnro);
         }
 
@@ -229,12 +216,11 @@ function tarkistaTallennusLomake($data, $get) {
     }
 }
 
-/* lasketaan ostosten yhteisarvo tilauksen kokonaisarvo-saraketta varten */
-
+/* lasketaan ostosten yhteisarvo tilaustaulun kokonaisarvo-saraketta varten */
 function laskeKokonaisArvo($ostokset) {
     $kokonaisarvo = 0;
     foreach ($ostokset as $ostos) {
-        $kokonaisarvo += $ostos->getMaara() * $ostos->getOstohinta();
+        $kokonaisarvo += $ostos->getTilattuMaara() * $ostos->getOstohinta();
     }
 
     return $kokonaisarvo;

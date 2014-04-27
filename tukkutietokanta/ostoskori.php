@@ -16,7 +16,7 @@ if (isset($_POST['tyhjenna'])) {
 /* päivitetään ostoskorin rivin kappalemäärä */
 if (isset($_POST['rivi']) && isset($_POST['kpl'])) {
     $tilausrivi = $_POST['rivi'];
-    $maara = $_POST['kpl'];
+    $tilattumaara = $_POST['kpl'];
     $ostoskori = (array) $_SESSION['ostoskori'];
     
     if (empty($tilausrivi)) {
@@ -29,11 +29,11 @@ if (isset($_POST['rivi']) && isset($_POST['kpl'])) {
         ));
     }
     
-    if ($maara == 0) {
+    if ($tilattumaara == 0) {
         unset($ostoskori[$tilausrivi]);
         $ostoskori = jarjestaRivit($ostoskori);
     } else {
-        $ostoskori = asetaOstoksenMaara($ostoskori, $tilausrivi, $maara);
+        $ostoskori = asetaOstoksenMaara($ostoskori, $tilausrivi, $tilattumaara);
     }
     
     if (empty($ostoskori)) {
@@ -59,20 +59,6 @@ function loytyyRivi($ostoskori, $tilausrivi) {
     return $loytyy;
 }
 
-/* poistaa ostoksen korista */
-function poistaOstoskorista($ostoskori, $tilausrivi) {
-    $kori = (array) $ostoskori;
-    foreach ($kori as $key => $ostos) {
-        if ($ostos->getTilausrivi() == (int) $tilausrivi) {
-            unset($kori[$key]);
-            unset($ostos);
-            break;
-        }
-    }
-    
-    return $kori;
-}
-
 function jarjestarivit($ostoskori) {
     $vanha = (array) $ostoskori;
     $uusi = array();
@@ -87,11 +73,11 @@ function jarjestarivit($ostoskori) {
 }
 
 /* asettaa ostoksen kappalemaaran */
-function asetaOstoksenMaara($ostoskori, $tilausrivi, $maara) {
+function asetaOstoksenMaara($ostoskori, $tilausrivi, $tilattumaara) {
     $kori = (array) $ostoskori;
     foreach ($kori as $ostos) {
         if ($ostos->getTilausrivi() == (int) $tilausrivi) {
-            $ostos->setMaara($maara);
+            $ostos->setTilattuMaara($tilattumaara);
             break;
         }
     }
@@ -150,7 +136,7 @@ function luoUusiOstosOlio($tuote, $riveja, $kpl) {
     $ostos->setValmistaja($tuote->getValmistaja());
     $ostos->setOstohinta($tuote->getHinta());
     $ostos->setSaldo($tuote->getSaldo());
-    $ostos->setMaara($kpl);
+    $ostos->setTilattuMaara($kpl);
     return $ostos;
 }
 

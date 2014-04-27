@@ -64,7 +64,6 @@
     <?php if (onYllapitaja()):?>
         <div class="row">
             <br>
-            <p><a class="btn btn-default col-md-offset-2" href="tuotevalikoima.php?haku=avoimet"><span class="glyphicon glyphicon-th-list"></span> Listaa tuotteet joista avoimia tilauksia</a></p>
             <p><a class = "btn btn-default col-md-offset-2" href = "tuotevalikoima.php?tuote=uusi"><span class="glyphicon glyphicon-plus-sign"></span> Uusi tuote</a></p>
         </div>
     <?php endif;?>

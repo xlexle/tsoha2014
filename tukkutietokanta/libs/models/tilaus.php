@@ -69,7 +69,7 @@ class Tilaus {
         list($parametrit, $lisaasql) = self::maaritaParametrit((array) $lomaketiedot);
         $parametrit[] = $tuloksia;
         $parametrit[] = ($sivu - 1) * $tuloksia;
-        $sql .= $lisaasql . " ORDER BY saapumisaika LIMIT ? OFFSET ?";
+        $sql .= $lisaasql . " ORDER BY saapumisaika desc LIMIT ? OFFSET ?";
         
         $kysely = getTietokantayhteys()->prepare($sql);
         $kysely->execute($parametrit);
@@ -104,7 +104,7 @@ class Tilaus {
 
         $asiakasnro = $lomaketiedot['asiakasnro'];
         $viite = $lomaketiedot['viite'];
-//        $tuotenro = $lomaketiedot['tuotenro'];
+        $tuotenro = $lomaketiedot['tuotenro'];
         $toimitettu = $lomaketiedot['toimitettu'];
         $laskutettu = $lomaketiedot['laskutettu'];
         $maksettu = $lomaketiedot['maksettu'];
@@ -118,15 +118,18 @@ class Tilaus {
             $lisaasql .= " AND ostoviite = ?";
             $params[] = $viite;
         }
-
-//        if (is_numeric($tuotenro)) {
-//            $lisaasql .= " AND tuotenro = ?";
-//            $params[] = $hinta_min;
-//        }
-
+        
         if ($toimitettu == 1) $lisaasql .= " AND toimitettu IS NOT NULL";
         if ($laskutettu == 1) $lisaasql .= " AND laskutettu IS NOT NULL";
         if ($maksettu == 1) $lisaasql .= " AND maksettu IS NOT NULL";
+        
+        if (is_numeric($tuotenro)) {
+            $lisaasql .= " AND tilausnro in 
+                (SELECT tilausnro from ostos
+                WHERE tuotenro = ? 
+                AND tilattumaara > 0)";
+            $params[] = $tuotenro;
+        }
 
         return array($params, $lisaasql);
     }

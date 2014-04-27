@@ -54,12 +54,12 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="luottoraja" class="col-md-2 control-label">Luottoraja</label>
+                <label for="luottoraja" class="col-md-2 control-label">Luottoraja (EUR)</label>
                 <div class="col-md-2">
                     <?php if ($data->muokkaa): ?>
-                        <input type="text" maxlength="9" class="form-control" id="luottoraja" name="luottoraja" value="<?php echo $asiakas->getLuottoraja();?> EUR">
+                        <input type="text" maxlength="9" class="form-control" id="luottoraja" name="luottoraja" value="<?php echo $asiakas->getLuottoraja();?>">
                     <?php else: ?>
-                        <p class="form-control-static"><?php echo $asiakas->getLuottoraja();?> EUR</p>
+                        <p class="form-control-static"><?php echo $asiakas->getLuottoraja();?></p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -79,7 +79,7 @@
                     </div>
                 </div>
             </form>
-        <?php else: ?>
+        <?php elseif (onYllapitaja()): ?>
             <form class="form-horizontal" action="asiakashallinta.php?muokkaa=<?php echo $asiakas->getTunnus();?>" method="POST">
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-4">
@@ -101,13 +101,23 @@
                 </div>
             </form>
         <?php else: ?>
-            <form class="form-horizontal" action="asiakashallinta.php" method="POST">
+            <form class="form-horizontal" action="tilausseuranta.php?haku=listaa" method="POST">
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-4">
-                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-repeat"></span> Uusi haku</button>
+                        <input type="hidden" name="asiakasnro" value="<?php echo $asiakas->getTunnus()?>">
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-repeat"></span> Hae tilaukset</button>
                     </div>
                 </div>
             </form>
+            <?php if (onYllapitaja()): ?>
+                <form class="form-horizontal" action="asiakashallinta.php" method="POST">
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-4">
+                            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-repeat"></span> Uusi haku</button>
+                        </div>
+                    </div>
+                </form>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>

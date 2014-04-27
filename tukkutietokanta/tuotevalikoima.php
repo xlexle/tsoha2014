@@ -52,10 +52,6 @@ switch ($_GET['haku']) {
     case "uusi":
         unset($_SESSION['ehdot']);
         siirryKontrolleriin("tuotevalikoima");
-
-    case "avoimet":
-        yllapitajaTarkistus();
-        naytaNakyma("tuotevalikoima", 1, array('success' => "listataan tuotteet joista avoimia tilauksia..."));
 }
 
 function listaaTuotteet($lomaketiedot, $sivu, $naytetaan) {
@@ -169,7 +165,9 @@ if (isset($_GET['tallenna'])) {
     $valmistaja = htmlspecialchars($_POST['valmistaja'], ENT_QUOTES);
     $hinta = htmlspecialchars($_POST['hinta'], ENT_QUOTES);
     $saldo = $_POST['saldo'];
+    if (empty($saldo)) $saldo = 0;
     $tilauskynnys = $_POST['tilauskynnys'];
+    if (empty($tilauskynnys)) $tilauskynnys = 0;
 
     $lomaketiedot = array(
         'koodi' => $koodi,
@@ -258,19 +256,19 @@ if (isset($_GET['poistafinal'])) {
     
     if (empty($tuotenro) || is_null($tuote)) {
         siirryKontrolleriin("tuotevalikoima", array(
-            'error' => "Tuotetta ei löytynyt.",
+            'error' => "Tuotetta ei löytynyt."
         ));
     }
 
     if (!Tuote::onPoistettu($tuotenro)) {
         siirryKontrolleriin('tuotevalikoima.php?muokkaa=' . $tuotenro, array(
-            'error' => 'Tuotetta ' . $tuotenro . ' ei voida poistaa lopullisesti, sillä tuote on vielä valikoimassa.',
+            'error' => 'Tuotetta ' . $tuotenro . ' ei voida poistaa lopullisesti, sillä tuote on vielä valikoimassa.'
         ));
     }
 
     if (Tuote::poistaLopullisesti($tuotenro)) {
         siirryKontrolleriin("tuotevalikoima", array(
-            'success' => "Tuotteen lopullinen poisto tietokannasta onnistui."
+            'success' => 'Tuotteen' . $tuotenro . 'lopullinen poisto onnistui.'
         ));
     }
 

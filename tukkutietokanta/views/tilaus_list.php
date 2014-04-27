@@ -50,9 +50,13 @@
                     <td><?php echo $tilaus->getAsiakasnro();?></td>
                     <td><?php echo $tilaus->getKokonaisarvo();?></td>
                     <td><?php echo formatoi($tilaus->getSaapumisaika());?></td>
-                    <td><a href="tilausseuranta.php?tilausnro=<?php echo $tilaus->getTilausnro();?>" target="_blank" title="Avaa tilaus"><span class="glyphicon glyphicon-eye-open"></span></a></td>
+                    <td><a href="tilausseuranta.php?tilausnro=<?php echo $tilaus->getTilausnro();?>" target="_blank" title="Avaa tilaus">
+                            <span class="glyphicon glyphicon-eye-open"></span></a>
+                    </td>
                     <?php if (onYllapitaja()):?>
-                        <td><a href="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" target="_blank" title="Muokkaa tilausta"><span class="glyphicon glyphicon-wrench"></span></a></td>
+                        <td><a href="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" target="_blank" title="Muokkaa tilausta">
+                                <span class="glyphicon glyphicon-wrench"></span></a>
+                        </td>
                     <?php endif;?>
                 </tr>
             <?php endforeach;?>

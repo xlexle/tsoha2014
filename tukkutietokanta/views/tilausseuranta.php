@@ -22,15 +22,6 @@
                     <input type="text" class="form-control" id="tuotenro" name="tuotenro" placeholder="6 numeroa">
                 </div>
             </div>
-<!--            <div class="form-group">
-                <label for="luontipvm_min" class="col-md-2 control-label">Luotu</label>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" id="luontipvm_min" name="luontipvm_min">
-                </div>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" id="luontipvm_max" name="luontipvm_max">
-                </div>
-            </div>-->
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-3">
                     <div class="checkbox">

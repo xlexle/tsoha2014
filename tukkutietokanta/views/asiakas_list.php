@@ -54,7 +54,6 @@
                     <td><?php echo $asiakas->getLuottoraja();?></td>
                     <td><a href="asiakashallinta.php?asiakasnro=<?php echo $asiakas->getTunnus();?>" target="_blank" title="Avaa asiakastiedot"><span class="glyphicon glyphicon-eye-open"></span></a></td>
                     <td><a href="asiakashallinta.php?muokkaa=<?php echo $asiakas->getTunnus();?>" target="_blank" title="Muokkaa asiakastietoja"><span class="glyphicon glyphicon-wrench"></span></a></td>
-                    <td><a href="#"><span class="glyphicon glyphicon-th-list" target="_blank" title="Listaa avoimet tilaukset"></span></a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

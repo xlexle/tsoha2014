@@ -78,7 +78,6 @@
                     <?php if (onYllapitaja()):?>
                         <?php if (!$data->poistettu):?>
                             <td><a href="tuotevalikoima.php?muokkaa=<?php echo $tuote->getTuotenro();?>" target="_blank" title="Muokkaa tuotetietoja"><span class="glyphicon glyphicon-wrench"></span></a></td>
-                            <td><a href="#" ><span class="glyphicon glyphicon-th-list" target="_blank" title="Listaa avoimet tilaukset"></span></a></td>
                         <?php endif;?>
                     <?php else:?>
                         <td><a href="ostoskori.php?lisaaostos=<?php echo $tuote->getTuotenro();?>"><span class="glyphicon glyphicon-shopping-cart" target="_blank" title="Lisää ostoskoriin 1 kpl"></span></a></td>

@@ -59,21 +59,6 @@
 
     <div class="row">
         <hr>
-        <?php if ($data->muokkaa):?>
-            <form class="form-horizontal" action="tilausseuranta.php?muokkaa=<?php echo $tilaus->getTilausnro();?>" method="POST">
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-1">
-                        <input type="number" min="1" max="<?php count($data->ostokset);?>" class="form-control" id="rivi" name="rivi" placeholder="rivi">
-                    </div>
-                    <div class="col-md-1">
-                        <input type="number" min="0" max="999" class="form-control" id="kpl" name="kpl" placeholder="kpl">
-                    </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> Muuta kappalemäärää</button>
-                    </div>
-                </div>
-            </form><br>
-        <?php endif;?>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -81,27 +66,27 @@
                     <th>Tuotenumero</th>
                     <th>Valmistajan koodi</th>
                     <th>Valmistaja</th>
-                    <th>EUR / kpl</th>
-                    <th>Kappalemäärä</th>
+                    <th>Kappalehinta (EUR)</th>
+                    <th>Saldolla / Tilattu</th>
                     <?php if (!$data->toimitettu):?>
-                        <th>Varastossa</th>
+                        <th>Varastossa vapaana</th>
                     <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($data->ostokset as $ostos):?>
+                <?php $summa = 0; foreach ($data->ostokset as $ostos):?>
                     <tr>
                         <td><?php echo $ostos->getTilausrivi();?></td>
                         <td><?php echo $ostos->getTuotenro();?></td>
                         <td><?php echo $ostos->getKoodi();?></td>
                         <td><?php echo $ostos->getValmistaja();?></td>
                         <td><?php echo $ostos->getOstohinta();?></td>
-                        <td><?php echo $ostos->getMaara();?></td>
+                        <td><?php echo $ostos->getAllokoitumaara();?> / <?php echo $ostos->getTilattumaara();?></td>
                         <?php if (!$data->toimitettu):?>
                             <td><?php echo $ostos->getSaldo();?></td>
                         <?php endif;?>
                     </tr>
-                <?php endforeach;?>
+                <?php $summa += $ostos->getTilattuMaara() * $ostos->getOstohinta(); endforeach;?>
             </tbody>
         </table>
         
@@ -110,15 +95,13 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">Summa</label>
                     <div class="col-md-4">
-                        <p class="form-control-static"><?php echo $tilaus->getKokonaisarvo();?> EUR</p>
+                        <p class="form-control-static"><?php echo $summa;?> EUR</p>
                     </div>
                 </div>
             </form>
         </div>
     </div>
     <hr>
-    
-    
     
     <div class="row">
         <?php if (!$data->muokkaa && !$data->toimitettu && onYllapitaja()):?>

@@ -34,7 +34,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="hinta" class="col-md-2 control-label">Hinta EUR</label>
+                <label for="hinta" class="col-md-2 control-label">Hinta (EUR)</label>
                 <div class="col-md-2">
                     <?php if ($data->muokkaa):?>
                         <input type="text" maxlength="12" class="form-control" id="hinta" name="hinta" value="<?php echo $tuote->getHinta();?>">
@@ -50,7 +50,7 @@
                         <?php if ($data->muokkaa):?>
                             <input type="number" min="0" class="form-control" id="saldo" name="saldo" value="<?php echo $tuote->getSaldo();?>">
                         <?php else:?>
-                            <p class="form-control-static"><?php echo $tuote->getHinta();?></p>
+                            <p class="form-control-static"><?php echo $tuote->getSaldo();?></p>
                         <?php endif;?>
                     </div>
                 </div>

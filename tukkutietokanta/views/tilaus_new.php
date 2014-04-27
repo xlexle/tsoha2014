@@ -56,10 +56,10 @@
                         <td><?php echo $ostos->getKoodi();?></td>
                         <td><?php echo $ostos->getValmistaja();?></td>
                         <td><?php echo $ostos->getOstohinta();?></td>
-                        <td><?php echo $ostos->getMaara();?></td>
+                        <td><?php echo $ostos->getTilattuMaara();?></td>
                         <td><?php echo $ostos->getSaldo();?></td>
                     </tr>
-            <?php $summa += $ostos->getMaara() * $ostos->getOstohinta(); endforeach; ?>
+            <?php $summa += $ostos->getTilattuMaara() * $ostos->getOstohinta(); endforeach; ?>
             </tbody>
         </table>
         

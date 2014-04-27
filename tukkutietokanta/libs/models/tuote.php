@@ -11,7 +11,7 @@ class Tuote {
     protected $hinta;
     protected $saldo;
     private $tilauskynnys;
-    private $avoimiaTilauksia = 0; /* placeholder value */
+    private $avoimiaTilauksia;
     private $poistettu;
 
     public function __construct() {
@@ -119,8 +119,21 @@ class Tuote {
         $tuote->setValmistaja($tulos->valmistaja);
         $tuote->setHinta($tulos->hinta);
         $tuote->setSaldo($tulos->saldo);
+        $tuote->setAvoimiaTilauksia(self::laskeAvoimetTilaukset($tulos->tuotenro));
         $tuote->setPoistettu($tulos->poistettu);
         return $tuote;
+    }
+    
+    private function laskeAvoimetTilaukset($tuotenro) {
+        $sql = "SELECT count(*) FROM tilaus 
+            WHERE toimitettu IS NULL
+            AND tilausnro in 
+            (SELECT tilausnro FROM ostos
+            WHERE tuotenro = ?
+            AND tilattumaara > 0)";
+        $kysely = getTietokantayhteys()->prepare($sql);
+        $kysely->execute(array($tuotenro));
+        return $kysely->fetchColumn();
     }
 
     /* lisää yksittäisen tuote-olion kantaan */
@@ -175,6 +188,12 @@ class Tuote {
         $kysely = getTietokantayhteys()->prepare($sql);
         $ok = $kysely->execute($parametrit);
         return $ok;
+    }
+    
+    public static function paivitaSaldo($saldo, $tuotenro) {
+        $sql = "UPDATE tuote SET saldo = ? WHERE tuotenro = ?";
+        $kysely = getTietokantayhteys()->prepare($sql);
+        $kysely->execute(array($saldo, $tuotenro));
     }
 
     /* tarkistaa, onko tuote poistettu valikoimasta */
